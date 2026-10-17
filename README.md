@@ -15,6 +15,7 @@ Default language is Spanish. Switch to English with one click on the panel. Voic
 - **Narration.** Say `narrate` and the answer is read aloud with a natural neural voice. Say `go` or `shut up` to stop it.
 - **Guided tours.** Claude draws arrows, boxes and labels over any window, narrates each step, erases it and moves to the next. Click-through: you keep using the app underneath.
 - **Language toggle.** `ES | EN` on the panel switches transcription, voice and UI strings live.
+- **Animated character.** Rover (the Windows XP search dog) or Merlin the wizard lives on the panel: searches and writes while Claude works, celebrates when done. Sprites from the open-source clippy.js project (MIT). Pick one with `"agente": "Merlin"` in `voz/config.json`.
 
 ## Setup
 
@@ -61,6 +62,7 @@ See `voz/tour_ejemplo.json`. Coordinates are pixels on the monitor given by `x`,
 - `voz/tour.py` guided tour runner: draw, narrate, erase, next
 - `voz/hook_paso.py` Claude Code hook that feeds the panel
 - `overlay.py` click-through arrows and labels over the screen
+- `voz/agente.py` animated character (Rover / Merlin)
 - `voz/tour_ejemplo.json` example tour
 
 Requires Windows, Python 3.11+, an NVIDIA GPU for Whisper (CPU works, slower) and internet for the neural voice (falls back to the Windows voice offline).
@@ -82,6 +84,7 @@ Idioma por defecto: español. Se pasa a inglés con un click en el panel. Los co
 - **Narración.** Decís `narralo` y la respuesta se lee con una voz neuronal natural. `va` o `callate` la cortan.
 - **Recorridos guiados.** Claude dibuja flechas, recuadros y carteles sobre cualquier ventana, narra cada paso, lo borra y sigue. Los clicks atraviesan el dibujo.
 - **Idioma.** `ES | EN` en el panel cambia transcripción, voz y textos en vivo.
+- **Personaje animado.** Rover (el perrito de la búsqueda de Windows XP) o Merlin el mago viven en el panel: buscan y escriben mientras Claude trabaja, festejan al terminar. Sprites del proyecto abierto clippy.js (MIT). Se elige con `"agente": "Merlin"` en `voz/config.json`.
 
 ## Arranque
 
@@ -128,6 +131,7 @@ Ver `voz/tour_ejemplo.json`. Las coordenadas son píxeles del monitor indicado p
 - `voz/tour.py` recorrido guiado: dibuja, narra, borra, sigue
 - `voz/hook_paso.py` hook de Claude Code que alimenta el panel
 - `overlay.py` flechas y carteles click-through sobre la pantalla
+- `voz/agente.py` personaje animado (Rover / Merlin)
 - `voz/tour_ejemplo.json` recorrido de ejemplo
 
 Requiere Windows, Python 3.11+, GPU NVIDIA para Whisper (en CPU anda, más lento) e internet para la voz neuronal (sin internet usa la voz de Windows).

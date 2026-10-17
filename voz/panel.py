@@ -111,9 +111,19 @@ l_estado = tk.Label(fila, text="...", fg=TEXTO, bg=FONDO, font=("Consolas", 11))
 
 # pasos de claude: una linea por paso, los hechos con ✓, el actual con spinner
 # accion.txt tiene un paso por linea; vacio = no esta haciendo nada
-l_accion = tk.Label(cuerpo, text="", fg=ACENTO, bg=FONDO, font=("Consolas", 11),
-                    justify="left", anchor="w")
-l_accion.pack(fill="x", padx=14, pady=(0, 6))
+# a la derecha, el personaje animado (Rover o Merlin) que trabaja cuando yo trabajo
+fila_pasos = tk.Frame(cuerpo, bg=FONDO); fila_pasos.pack(fill="x", padx=14, pady=(0, 6))
+l_accion = tk.Label(fila_pasos, text="", fg=ACENTO, bg=FONDO, font=("Consolas", 11),
+                    justify="left", anchor="nw")
+l_accion.pack(side="left", fill="both", expand=True)
+agente = None
+try:
+    from agente import Agente
+    _nombre_ag = CFG.agente() if hasattr(CFG, "agente") else "Rover"
+    agente = Agente(fila_pasos, _nombre_ag, escala=(1.0 if _nombre_ag == "Rover" else 0.7), bg=FONDO)
+    agente.pack(side="right", padx=(6, 0))
+except Exception as _e:
+    agente = None
 
 # la caja unica con el dictado
 marco = tk.Frame(cuerpo, bg=TENUE)
@@ -273,8 +283,10 @@ def refrescar():
     if pasos:
         lineas = ["✓ " + p for p in pasos[:-1]] + [SPIN[tick % len(SPIN)] + " " + pasos[-1]]
         l_accion.configure(text="\n".join(lineas))
+        if agente: agente.modo("trabajando")
     else:
         l_accion.configure(text="")
+        if agente and agente._modo == "trabajando": agente.modo("listo")
     poner(leer(DICTADO))
     r = leer(RESP)
     if r:

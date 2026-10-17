@@ -13,8 +13,19 @@ def lang():
     except Exception:
         return "es"
 
+def _leer():
+    try:
+        return json.loads(ARCHIVO.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
 def set_lang(l):
-    ARCHIVO.write_text(json.dumps({"lang": l}), encoding="utf-8")
+    d = _leer(); d["lang"] = l
+    ARCHIVO.write_text(json.dumps(d), encoding="utf-8")
+
+def agente():
+    # personaje del panel: "Rover" (perrito) o "Merlin" (mago). se cambia en config.json
+    return _leer().get("agente", "Rover")
 
 # textos que cambian con el idioma
 T = {

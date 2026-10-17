@@ -9,3 +9,4 @@ voz/orden_pendiente
 __pycache__/
 .env
 voz/_tts/
+!voz/_agentes/
