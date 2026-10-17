@@ -15,7 +15,7 @@ Default language is Spanish. Switch to English with one click on the panel. Voic
 - **Narration.** Say `narrate` and the answer is read aloud with a natural neural voice. Say `go` or `shut up` to stop it.
 - **Guided tours.** Claude draws arrows, boxes and labels over any window, narrates each step, erases it and moves to the next. Click-through: you keep using the app underneath.
 - **Language toggle.** `ES | EN` on the panel switches transcription, voice and UI strings live.
-- **Animated character.** Rover (the Windows XP search dog) or Merlin the wizard lives on the panel: searches and writes while Claude works, celebrates when done. Sprites from the open-source clippy.js project (MIT). Pick one with `"agente": "Merlin"` in `voz/config.json`.
+- **Animated character.** Rover (the Windows XP search dog), Merlin the wizard or Clippy lives on the panel: searches and writes while Claude works, celebrates when done, rests when idle. Left-click it for a random interaction, right-click to switch character. Sprites from the open-source clippy.js project (MIT).
 
 ## Setup
 
@@ -84,7 +84,7 @@ Idioma por defecto: español. Se pasa a inglés con un click en el panel. Los co
 - **Narración.** Decís `narralo` y la respuesta se lee con una voz neuronal natural. `va` o `callate` la cortan.
 - **Recorridos guiados.** Claude dibuja flechas, recuadros y carteles sobre cualquier ventana, narra cada paso, lo borra y sigue. Los clicks atraviesan el dibujo.
 - **Idioma.** `ES | EN` en el panel cambia transcripción, voz y textos en vivo.
-- **Personaje animado.** Rover (el perrito de la búsqueda de Windows XP) o Merlin el mago viven en el panel: buscan y escriben mientras Claude trabaja, festejan al terminar. Sprites del proyecto abierto clippy.js (MIT). Se elige con `"agente": "Merlin"` en `voz/config.json`.
+- **Personaje animado.** Rover (el perrito de la búsqueda de Windows XP), Merlin el mago o Clippy viven en el panel: buscan y escriben mientras Claude trabaja, festejan al terminar, descansan en espera. Click izquierdo: una interacción al azar. Click derecho: cambia de personaje. Sprites del proyecto abierto clippy.js (MIT).
 
 ## Arranque
 

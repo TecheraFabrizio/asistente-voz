@@ -24,8 +24,12 @@ def set_lang(l):
     ARCHIVO.write_text(json.dumps(d), encoding="utf-8")
 
 def agente():
-    # personaje del panel: "Rover" (perrito) o "Merlin" (mago). se cambia en config.json
+    # personaje del panel: "Rover" (perrito), "Merlin" (mago) o "Clippy". click derecho en el panel lo cambia
     return _leer().get("agente", "Rover")
+
+def set_agente(n):
+    d = _leer(); d["agente"] = n
+    ARCHIVO.write_text(json.dumps(d), encoding="utf-8")
 
 # textos que cambian con el idioma
 T = {

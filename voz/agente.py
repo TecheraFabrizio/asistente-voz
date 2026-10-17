@@ -1,37 +1,58 @@
-# Personaje animado para el panel (Rover, el perrito de la busqueda de Windows XP, o Merlin el mago).
+# Personaje animado para el panel: Rover (perrito de la busqueda de Windows XP), Merlin (mago) o Clippy.
 # Sprites y datos de animacion del proyecto clippy.js (MIT). Van en voz/_agentes/<Nombre>/map.png + agent.json.
+#
 # Uso en tkinter:
-#   ag = Agente(padre, "Rover"); ag.pack(); ag.modo("trabajando")  /  ag.modo("quieto")
+#   ag = Agente(padre, "Rover", al_cambiar=funcion); ag.pack()
+#   ag.modo("trabajando") / ag.modo("quieto") / ag.modo("listo")
+# Click izquierdo: hace una interaccion. Click derecho: pasa al siguiente personaje (llama al_cambiar).
 
 import json, random, tkinter as tk
 from pathlib import Path
 from PIL import Image, ImageTk
 
 C = Path(__file__).parent / "_agentes"
+ORDEN = ["Rover", "Merlin", "Clippy"]        # orden al cambiar con click derecho
+ESCALA = {"Rover": 1.0, "Merlin": 0.7, "Clippy": 0.75}
 
-# que animaciones usa cada modo
+# que animaciones usa cada modo, por personaje
 MODOS = {
     "Rover": {
         "trabajando": ["Searching", "Thinking", "Writing", "ImageSearching", "Books", "GetAttention"],
-        "quieto": ["Idle", "RestPose", "LookUp", "Pleased"],
+        "quieto": ["Idle", "RestPose", "LookUp", "LookUpLeft"],
         "listo": ["Congratulate", "CharacterSucceeds", "Pleased"],
+        "click": ["ClickedOn", "Sports", "Cooking", "Travel", "Money", "Shopping", "Celebrity", "Surprised",
+                  "Embarrassed", "Acknowledge", "Greet", "GestureLeft"],
     },
     "Merlin": {
-        "trabajando": ["Processing", "Searching", "Writing", "Thinking", "Reading", "DoMagic1"],
-        "quieto": ["Idle1_1", "Idle1_2", "RestPose", "Blink", "LookLeft", "LookRight"],
-        "listo": ["Congratulate", "Pleased", "DoMagic2"],
+        "trabajando": ["Processing", "Searching", "Writing", "Thinking", "Reading", "DoMagic1", "Read"],
+        "quieto": ["Idle1_1", "Idle1_2", "Idle1_3", "Idle2_1", "RestPose", "Blink", "LookLeft", "LookRight"],
+        "listo": ["Congratulate", "Pleased", "DoMagic2", "Congratulate_2"],
+        "click": ["Wave", "DoMagic1", "DoMagic2", "GestureUp", "Surprised", "Confused", "Explain", "Announce",
+                  "Greet", "Alert", "Suggest", "Sad"],
+    },
+    "Clippy": {
+        "trabajando": ["Searching", "Thinking", "Writing", "Processing", "CheckingSomething", "GetTechy", "Print"],
+        "quieto": ["Idle1_1", "IdleAtom", "IdleEyeBrowRaise", "IdleFingerTap", "IdleHeadScratch", "IdleRopePile",
+                   "IdleSideToSide", "IdleSnooze", "RestPose", "LookLeft", "LookRight"],
+        "listo": ["Congratulate", "Wave", "GetArtsy"],
+        "click": ["Wave", "Greeting", "Alert", "Explain", "GetArtsy", "GetWizardy", "EmptyTrash", "SendMail",
+                  "Save", "GestureUp", "GestureDown", "GoodBye"],
     },
 }
 
+def siguiente(nombre):
+    i = ORDEN.index(nombre) if nombre in ORDEN else -1
+    return ORDEN[(i + 1) % len(ORDEN)]
+
 class Agente(tk.Canvas):
-    def __init__(self, padre, nombre="Rover", escala=1.0, bg="#12171f", **kw):
+    def __init__(self, padre, nombre="Rover", escala=None, bg="#12171f", al_cambiar=None, **kw):
         self.nombre = nombre
         carpeta = C / nombre
         self.datos = json.loads((carpeta / "agent.json").read_text(encoding="utf-8"))
         self.fw, self.fh = self.datos["framesize"]
-        self.escala = escala
-        self.w, self.h = int(self.fw * escala), int(self.fh * escala)
-        super().__init__(padre, width=self.w, height=self.h, bg=bg, highlightthickness=0, **kw)
+        self.escala = escala if escala is not None else ESCALA.get(nombre, 1.0)
+        self.w, self.h = int(self.fw * self.escala), int(self.fh * self.escala)
+        super().__init__(padre, width=self.w, height=self.h, bg=bg, highlightthickness=0, cursor="hand2", **kw)
         self.mapa = Image.open(carpeta / "map.png").convert("RGBA")
         self.cache = {}
         self._modo = "quieto"
@@ -39,6 +60,9 @@ class Agente(tk.Canvas):
         self._i = 0
         self._job = None
         self._item = self.create_image(0, 0, anchor="nw")
+        self.bind("<Button-1>", lambda e: self.modo("click", forzar=True))
+        if al_cambiar:
+            self.bind("<Button-3>", lambda e: al_cambiar(siguiente(self.nombre)))
         self._siguiente_anim()
 
     def _cuadro(self, imagenes):
@@ -47,15 +71,14 @@ class Agente(tk.Canvas):
         if clave not in self.cache:
             base = Image.new("RGBA", (self.fw, self.fh), (0, 0, 0, 0))
             for x, y in imagenes:
-                capa = self.mapa.crop((x, y, x + self.fw, y + self.fh))
-                base.alpha_composite(capa)
+                base.alpha_composite(self.mapa.crop((x, y, x + self.fw, y + self.fh)))
             if self.escala != 1.0:
                 base = base.resize((self.w, self.h), Image.LANCZOS)
             self.cache[clave] = ImageTk.PhotoImage(base)
         return self.cache[clave]
 
-    def modo(self, m):
-        if m != self._modo:
+    def modo(self, m, forzar=False):
+        if m != self._modo or forzar:
             self._modo = m
             self._siguiente_anim()
 
@@ -70,8 +93,8 @@ class Agente(tk.Canvas):
 
     def _paso(self):
         if self._i >= len(self._anim):
-            # termino la animacion: elijo otra del mismo modo (si era "listo", vuelvo a quieto)
-            if self._modo == "listo":
+            # termino: si era un gesto puntual (click / listo), vuelvo a quieto; si no, otra del mismo modo
+            if self._modo in ("listo", "click"):
                 self._modo = "quieto"
             self._siguiente_anim(); return
         f = self._anim[self._i]
@@ -79,3 +102,8 @@ class Agente(tk.Canvas):
             self.itemconfigure(self._item, image=self._cuadro(f["images"]))
         self._i += 1
         self._job = self.after(max(int(f.get("duration", 100)), 30), self._paso)
+
+    def destruir(self):
+        if self._job:
+            self.after_cancel(self._job); self._job = None
+        self.destroy()

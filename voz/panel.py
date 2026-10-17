@@ -117,13 +117,21 @@ l_accion = tk.Label(fila_pasos, text="", fg=ACENTO, bg=FONDO, font=("Consolas", 
                     justify="left", anchor="nw")
 l_accion.pack(side="left", fill="both", expand=True)
 agente = None
-try:
-    from agente import Agente
-    _nombre_ag = CFG.agente() if hasattr(CFG, "agente") else "Rover"
-    agente = Agente(fila_pasos, _nombre_ag, escala=(1.0 if _nombre_ag == "Rover" else 0.7), bg=FONDO)
-    agente.pack(side="right", padx=(6, 0))
-except Exception as _e:
-    agente = None
+def _crear_agente(nombre):
+    # arma el personaje; click derecho sobre el llama a esto con el siguiente
+    global agente
+    try:
+        from agente import Agente
+        if agente is not None:
+            agente.destruir()
+        agente = Agente(fila_pasos, nombre, bg=FONDO, al_cambiar=_cambiar_agente)
+        agente.pack(side="right", padx=(6, 0))
+    except Exception:
+        agente = None
+def _cambiar_agente(nombre):
+    CFG.set_agente(nombre)
+    _crear_agente(nombre)
+_crear_agente(CFG.agente())
 
 # la caja unica con el dictado
 marco = tk.Frame(cuerpo, bg=TENUE)
