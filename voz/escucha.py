@@ -256,8 +256,8 @@ def main():
                             callar()
                             estado("escuchando")
                             continue
-                        if corto and pocas and (m or mf):
-                            # dijo "va" encima de la narracion: la corto y sigo como si arrancara el dictado
+                        if (corto and pocas and (m or mf)) or NARRAR.match(texto):
+                            # dijo "va" o "narrámelo" encima de la voz: la corto y sigo con el comando
                             callar()
                         else:
                             estado("escuchando")
