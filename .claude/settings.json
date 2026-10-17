@@ -1,0 +1,40 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python voz/hook_paso.py prompt",
+            "timeout": 5,
+            "statusMessage": "panel"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python voz/hook_paso.py pre",
+            "timeout": 5,
+            "statusMessage": "panel"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python voz/hook_paso.py stop",
+            "timeout": 5,
+            "statusMessage": "panel"
+          }
+        ]
+      }
+    ]
+  }
+}

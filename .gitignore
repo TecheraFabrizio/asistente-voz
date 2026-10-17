@@ -1,0 +1,11 @@
+# estado en vivo del asistente, no es codigo
+voz/*.txt
+voz/_*
+voz/*.log
+voz/*.png
+voz/*.mp3
+voz/flechas.json
+voz/orden_pendiente
+__pycache__/
+.env
+voz/_tts/

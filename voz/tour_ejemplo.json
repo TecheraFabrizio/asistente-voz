@@ -1,0 +1,23 @@
+{
+  "x": 0, "y": 0, "w": 1920, "h": 1080,
+  "pasos": [
+    {
+      "items": [
+        {"type": "box", "x": 20, "y": 20, "w": 300, "h": 40},
+        {"type": "num", "x": 330, "y": 24, "n": 1},
+        {"type": "arrow", "x1": 400, "y1": 200, "x2": 330, "y2": 60},
+        {"type": "label", "x": 320, "y": 210, "text": "1  Barra de menú"}
+      ],
+      "texto": "Paso uno. Esta es la barra de menú de la aplicación. Desde acá se abren los archivos y las opciones."
+    },
+    {
+      "items": [
+        {"type": "box", "x": 20, "y": 80, "w": 400, "h": 300},
+        {"type": "num", "x": 430, "y": 84, "n": 2},
+        {"type": "arrow", "x1": 600, "y1": 500, "x2": 420, "y2": 380},
+        {"type": "label", "x": 520, "y": 510, "text": "2  Zona principal"}
+      ],
+      "texto": "Paso dos. Esta es la zona principal de trabajo. Lo que hagas acá es lo que se ve en pantalla."
+    }
+  ]
+}

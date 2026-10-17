@@ -1,0 +1,7 @@
+faster-whisper
+sounddevice
+numpy
+edge-tts
+pyautogui
+nvidia-cublas-cu12
+nvidia-cudnn-cu12
