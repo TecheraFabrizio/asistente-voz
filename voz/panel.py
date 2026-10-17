@@ -112,20 +112,24 @@ l_estado = tk.Label(fila, text="...", fg=TEXTO, bg=FONDO, font=("Consolas", 11))
 # pasos de claude: una linea por paso, los hechos con ✓, el actual con spinner
 # accion.txt tiene un paso por linea; vacio = no esta haciendo nada
 # a la derecha, el personaje animado (Rover o Merlin) que trabaja cuando yo trabajo
-fila_pasos = tk.Frame(cuerpo, bg=FONDO); fila_pasos.pack(fill="x", padx=14, pady=(0, 6))
+# la fila tiene altura fija y el personaje un hueco fijo de 96x96: nada se mueve al cambiar de personaje ni al aparecer pasos
+fila_pasos = tk.Frame(cuerpo, bg=FONDO, height=96); fila_pasos.pack(fill="x", padx=14, pady=(0, 6))
+fila_pasos.pack_propagate(False)
+hueco = tk.Frame(fila_pasos, bg=FONDO, width=96, height=96); hueco.pack(side="right")
+hueco.pack_propagate(False)
 l_accion = tk.Label(fila_pasos, text="", fg=ACENTO, bg=FONDO, font=("Consolas", 11),
                     justify="left", anchor="nw")
 l_accion.pack(side="left", fill="both", expand=True)
 agente = None
 def _crear_agente(nombre):
-    # arma el personaje; click derecho sobre el llama a esto con el siguiente
+    # arma el personaje centrado en su hueco; click derecho sobre el llama a esto con el siguiente
     global agente
     try:
         from agente import Agente
         if agente is not None:
             agente.destruir()
-        agente = Agente(fila_pasos, nombre, bg=FONDO, al_cambiar=_cambiar_agente)
-        agente.pack(side="right", padx=(6, 0))
+        agente = Agente(hueco, nombre, bg=FONDO, al_cambiar=_cambiar_agente)
+        agente.place(relx=0.5, rely=0.5, anchor="center")
     except Exception:
         agente = None
 def _cambiar_agente(nombre):
