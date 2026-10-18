@@ -355,6 +355,12 @@ def main():
                         estado("escuchando")
                         continue
 
+                    # "quiet" / "callate" en medio del dictado: corta la voz, no se agrega al texto
+                    if CALLAR.match(texto):
+                        callar()
+                        estado("dictando")
+                        continue
+
                     # "va" de nuevo mientras dictas: borra lo anterior y arranca de cero
                     if dictado is not None and corto and pocas and (m or mf):
                         dictado = []
