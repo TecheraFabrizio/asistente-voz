@@ -260,6 +260,8 @@ def main():
                     t0 = time.time()
                     dur_voz = len(audio) / FS - SILENCIO_FIN
                     corto = dur_voz < CORTO
+                    if dur_voz < 0.3:
+                        continue            # un golpe, un click: no es una palabra
                     if corto:
                         # relleno con silencio: whisper inventa menos con clips cortos
                         pad = np.zeros(int(FS * 0.4), dtype=np.float32)
@@ -267,7 +269,8 @@ def main():
                     # clip corto ("va", "listo"): idioma fijo, que no adivine con una palabra.
                     # frase larga: whisper detecta solo si hablaste en español o en ingles y lo escribe en ese idioma
                     if corto:
-                        idioma, prompt = LANG, CFG.t("prompt_whisper")
+                        # sin prompt: con "go ... done" en el prompt, el ruido salia transcripto como "go." o "done."
+                        idioma, prompt = LANG, None
                     else:
                         idioma, prompt = None, "va. listo. go. done."
                     segs, info = modelo.transcribe(audio, language=idioma, beam_size=5,
@@ -288,7 +291,8 @@ def main():
                     hora = time.strftime("%H:%M:%S")
                     with LOG.open("a", encoding="utf-8") as f:
                         f.write(f"{hora} | {texto}\n")
-                    print(f"[{dt:.2f}s {info.language}] {texto}")
+                    rms = float(np.sqrt(np.mean(audio ** 2)))
+                    print(f"[{dt:.2f}s {info.language} {dur_voz:.1f}s rms={rms:.3f}] {texto}")
 
                     ahora = time.time()
                     m = WAKE.match(texto)
@@ -338,8 +342,6 @@ def main():
                             texto = texto[m.end():].strip()
                         elif mf:
                             texto = texto[:mf.start()].strip()
-                        elif corto and pocas and not FIN.search(texto):
-                            texto = ""
                         else:
                             # un "listo" suelto o cualquier otra cosa sin "va": no es para mi
                             estado("escuchando")
