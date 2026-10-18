@@ -58,7 +58,7 @@ VER = re.compile(r"^\W*(ver|mostr\w*|abr\w*|abre|show|open|display)\w*\b.{0,25}\
 NARRAR = re.compile(r"^\W*(narr[aá]lo|narr[aá]melo|narralo|d[aá]ramelo|n[aá]rramelo|narramelo|arr[aá]melo|\w{0,2}arr[aá]melo"
                     r"|\w{0,3}\s?r+[aá]\s?m[ei]\s?lo"      # "a rami lo", "arrámelo", "dárame lo": como sea que whisper lo escriba
                     r"|explic[aá]lo|explic[aá]melo|l[eé]+lo|l[eé]+melo|cont[aá]melo|contalo"
-                    r"|narrat(e|es|ed|ing)( it)?( to me)?|narration|read (it|that|this|the (text|answer|modal|panel|response))( to me| in the (modal|panel))?|read me the (text|answer)|explain( it)?|tell me)\W*$", re.I)
+                    r"|le[eé](me)?( el texto| la respuesta| el modal)?( en voz alta)?|read (the text|it) (aloud|out loud)|narrat(e|es|ed|ing)( it)?( to me)?|narration|read (it|that|this|the (text|answer|modal|panel|response))( to me| in the (modal|panel))?|read me the (text|answer)|explain( it)?|tell me)\W*$", re.I)
 # "callate" / "shut up" corta la narracion
 CALLAR = re.compile(r"^\W*(call[aá]te|c[aá]llate|par[aá]|basta|silencio|stop|shut up|quiet|be quiet|silence)\W*$", re.I)
 NARRACION = CARPETA / "narracion.txt"
@@ -280,12 +280,9 @@ def main():
                     if dur_voz < 0.15:
                         continue            # un golpe, un click: no es una palabra. "done" dura 0.3 s (medido)
                     rms = float(np.sqrt(np.mean(audio ** 2)))
-                    # clips muy cortos ("go", "done" de 0.2 s): el detector de voz los duda, asi que ahi decide el volumen
-                    # (medido 17-oct: ruido 0.004-0.006, "go" real desde 0.007). clips mas largos: decide el detector
-                    if dur_voz < 0.4:
-                        es_voz = rms >= 0.0065
-                    else:
-                        es_voz = bool(get_speech_timestamps(audio, VAD))
+                    # el detector de voz rechazo clips reales (uno de 0.5 s a volumen 0.083, 17-oct 23:45), asi que
+                    # solo ayuda: un clip pasa si tiene volumen (ruido medido: 0.004-0.006) o si el detector dice que es voz
+                    es_voz = rms >= 0.0065 or bool(get_speech_timestamps(audio, VAD))
                     if not es_voz:
                         print(f"[no es voz {dur_voz:.1f}s rms={rms:.3f}]")
                         continue            # hubo sonido pero no es una voz: no se transcribe ni pita
