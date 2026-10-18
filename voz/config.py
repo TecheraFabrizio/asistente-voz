@@ -48,6 +48,8 @@ T = {
         "p_leer": "leyendo ", "p_buscar": "buscando ", "p_agente": "consultando: ", "p_vigilar": "vigilando ",
         "p_web": "buscando en la web", "p_chrome": "usando Chrome",
         "borrar_dibujos": "✕ borrar dibujos",
+        # lo que dice el personaje en su globo segun el estado
+        "b_grabando": "Te escucho…", "b_transcribiendo": "Anotando…", "b_dictando": "Seguí. Decí \"listo\" al terminar.",
     },
     "en": {
         "voz": "en-US-GuyNeural",
@@ -63,6 +65,7 @@ T = {
         "p_leer": "reading ", "p_buscar": "searching ", "p_agente": "asking: ", "p_vigilar": "watching ",
         "p_web": "searching the web", "p_chrome": "using Chrome",
         "borrar_dibujos": "✕ clear drawings",
+        "b_grabando": "I'm listening…", "b_transcribiendo": "Writing it down…", "b_dictando": "Go on. Say \"done\" when finished.",
     },
 }
 

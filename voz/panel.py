@@ -130,6 +130,11 @@ def _refrescar_burbuja():
         try: BURBUJA.write_text("", encoding="utf-8")
         except Exception: pass
         txt = ""
+    if not txt:
+        # sin mensaje: el personaje comenta el estado del mic (grabando, anotando, esperando el "listo")
+        e = leer(ESTADO).strip()
+        if e in ("grabando", "transcribiendo", "dictando"):
+            txt = CFG.t("b_" + e)
     if txt:
         l_burbuja.configure(text=txt)
         # pegado arriba del personaje, a la derecha de la fila de estado
