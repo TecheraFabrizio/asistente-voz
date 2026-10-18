@@ -126,7 +126,7 @@ class Globo(tk.Canvas):
         super().__init__(padre, bg=FONDO, highlightthickness=0)
     def mostrar(self, texto):
         self.delete("all")
-        t = self.create_text(0, 0, text=texto, font=self.FUENTE, fill=TEXTO, anchor="nw", width=self.ANCHO_MAX)
+        t = self.create_text(0, 0, text=texto, font=self.FUENTE, fill="#111111", anchor="nw", width=self.ANCHO_MAX)
         x1, y1, x2, y2 = self.bbox(t)
         tw, th = x2 - x1, y2 - y1
         w, h = tw + 2 * self.PAD + 2, th + 2 * self.PAD
@@ -137,10 +137,10 @@ class Globo(tk.Canvas):
             P += [(cx + sx * r, cy), (cx + sx * r, cy + sy * r), (cx, cy + sy * r)]
         pts = [P[1], P[2], P[3], P[4], P[5], P[6], P[7], P[8], P[9], P[10], P[11], P[0]]
         cola = [(w - 46, h - 1), (w - 22, h + self.COLA), (w - 26, h - 1)]
-        self.create_polygon(cola, fill="#2a3442", outline=ACENTO, width=1)
-        self.create_polygon(pts, smooth=True, fill="#2a3442", outline=ACENTO, width=1)
+        self.create_polygon(cola, fill="white", outline="#333333", width=2)
+        self.create_polygon(pts, smooth=True, fill="white", outline="#333333", width=2)
         # tapa el borde entre el globo y la colita
-        self.create_line(w - 44, h - 1, w - 28, h - 1, fill="#2a3442", width=3)
+        self.create_line(w - 43, h - 1, w - 29, h - 1, fill="white", width=4)
         self.coords(t, 1 + self.PAD, 1 + self.PAD); self.tag_raise(t)
 l_burbuja = Globo(cuerpo)
 _burbuja = {"texto": "", "desde": 0.0}

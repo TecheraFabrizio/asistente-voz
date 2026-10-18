@@ -381,6 +381,12 @@ def main():
                         estado("escuchando")
                         continue
 
+                    # "assistant hide" / "show" tambien en medio del dictado; no se agregan al texto
+                    if OCULTAR.match(texto):
+                        OCULTO.write_text("1", encoding="utf-8"); beep(True); estado("dictando"); continue
+                    if MOSTRAR.match(texto):
+                        OCULTO.unlink(missing_ok=True); beep(True); estado("dictando"); continue
+
                     # "quiet" / "callate" en medio del dictado: corta la voz, no se agrega al texto
                     if CALLAR.match(texto):
                         callar()
