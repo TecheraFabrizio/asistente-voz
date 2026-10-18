@@ -280,7 +280,13 @@ def main():
                     if dur_voz < 0.15:
                         continue            # un golpe, un click: no es una palabra. "done" dura 0.3 s (medido)
                     rms = float(np.sqrt(np.mean(audio ** 2)))
-                    if not get_speech_timestamps(audio, VAD):
+                    # clips muy cortos ("go", "done" de 0.2 s): el detector de voz los duda, asi que ahi decide el volumen
+                    # (medido 17-oct: ruido 0.004-0.006, "go" real desde 0.007). clips mas largos: decide el detector
+                    if dur_voz < 0.4:
+                        es_voz = rms >= 0.0065
+                    else:
+                        es_voz = bool(get_speech_timestamps(audio, VAD))
+                    if not es_voz:
                         print(f"[no es voz {dur_voz:.1f}s rms={rms:.3f}]")
                         continue            # hubo sonido pero no es una voz: no se transcribe ni pita
                     if corto:
