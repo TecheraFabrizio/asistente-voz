@@ -155,6 +155,7 @@ class Globo(tk.Canvas):
         self.create_rectangle(x0, y0, x0 + tw, y0 + th, fill="white", outline="")
         # burbujitas que bajan hacia la cabeza del personaje
         bx, by = x0 + tw * 0.6, y0 + th + r + 4
+        self.cola = (bx + 10, by + 15 + 4)        # punta de la cola: la burbujita chica, por abajo
         for (cx, cy, rr) in ((bx, by, 7), (bx + 10, by + 15, 4)):
             self.create_oval(cx - rr - 3, cy - rr - 3, cx + rr + 3, cy + rr + 3, fill="#111111", outline="")
             self.create_oval(cx - rr, cy - rr, cx + rr, cy + rr, fill="white", outline="")
@@ -168,8 +169,10 @@ def _ubicar_nube():
     # centrada sobre el personaje, pegada a su cabeza
     if agente is None: return
     W, H = l_burbuja.winfo_reqwidth(), l_burbuja.winfo_reqheight()
-    x = flot.winfo_x() + agente.w // 2 - W // 2 + 8
-    y = flot.winfo_y() - H + 10
+    hx, hy = agente.cabeza()                       # arriba de la cabeza, segun el frame actual
+    tx, ty = getattr(l_burbuja, "cola", (W * 0.6, H))
+    x = int(flot.winfo_x() + hx - tx)
+    y = int(flot.winfo_y() + hy - ty - 4)
     x = max(0, min(x, root.winfo_screenwidth() - W))      # que no se salga de la pantalla
     nube.geometry(f"{W}x{H}+{x}+{max(y, 0)}")
 _burbuja = {"texto": "", "desde": 0.0}

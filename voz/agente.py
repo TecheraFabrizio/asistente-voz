@@ -75,6 +75,7 @@ class Agente(tk.Canvas):
         self._i = 0
         self._job = None
         self._item = self.create_image(0, 0, anchor="nw")
+        self.bbox_visible = (0, 0, self.w, self.h)     # donde esta el dibujo dentro del cuadro (cambia por frame)
         self.bind("<Button-1>", lambda e: self.modo("click", forzar=True))
         if al_cambiar:
             self.bind("<Button-3>", lambda e: al_cambiar(siguiente(self.nombre)))
@@ -91,7 +92,7 @@ class Agente(tk.Canvas):
                 base = base.resize((self.w, self.h), Image.LANCZOS)
             if self.alfa_duro:
                 base.putalpha(base.getchannel("A").point(lambda a: 255 if a >= 110 else 0))
-            self.cache[clave] = ImageTk.PhotoImage(base)
+            self.cache[clave] = (ImageTk.PhotoImage(base), base.getbbox() or (0, 0, self.w, self.h))
         return self.cache[clave]
 
     def modo(self, m, forzar=False):
@@ -127,9 +128,15 @@ class Agente(tk.Canvas):
             self._siguiente_anim(); return
         f = self._anim[self._i]
         if f.get("images"):
-            self.itemconfigure(self._item, image=self._cuadro(f["images"]))
+            foto, self.bbox_visible = self._cuadro(f["images"])
+            self.itemconfigure(self._item, image=foto)
         self._i += 1
         self._job = self.after(max(int(f.get("duration", 100)), 30), self._paso)
+
+    def cabeza(self):
+        # punto arriba del centro de la cabeza, en coordenadas del canvas. la nube apunta aca
+        l, t, r, b = self.bbox_visible
+        return ((l + r) // 2, t)
 
     def destruir(self):
         if self._job:
