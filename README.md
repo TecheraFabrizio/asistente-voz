@@ -13,7 +13,7 @@ Default language is English. Switch to Spanish with one click on the panel. Voic
 - **Edit before sending.** Click the dictation box and fix the transcript by hand. What is in the box is what gets sent: say `done` or press **Enter**. **Esc** releases the box.
 - **Status panel.** Shows whether it is idle, recording or transcribing, what you dictated, and every step Claude takes, in real time.
 - **Answer panel.** Claude's reply, formatted (headings, bullets, bold), attached above the status panel. Scrollable, collapsible, slightly transparent.
-- **Narration.** Say `narrate` and the answer is read aloud with a natural neural voice. Say `go` or `shut up` to stop it.
+- **Narration.** Say `narrate` and the answer is read aloud with a natural neural voice. Say `go` or `quiet` to stop it.
 - **Guided tours.** Claude draws arrows, boxes and labels over any window, narrates each step, erases it and moves to the next. Click-through: you keep using the app underneath.
 - **Language toggle.** `ES | EN` on the panel switches transcription, voice and UI strings live.
 - **Animated character.** Rover (the Windows XP search dog), Merlin the wizard or Clippy lives on the panel: searches and writes while Claude works, celebrates when done, rests when idle. Left-click it for a random interaction, right-click to switch character. Sprites from the open-source clippy.js project (MIT).
@@ -56,7 +56,7 @@ Claude writes its reply to `voz/ultima_respuesta.txt` (and copies it to `voz/res
 | `cancel` | `cancelá` | drop the dictation |
 | `show answer` / `close` | `ver respuesta` / `cerralo` | open / close the answer panel |
 | `narrate` | `narralo` | read the answer out loud |
-| `shut up` | `callate` | stop the voice |
+| `quiet` / `stop` | `callate` | stop the voice |
 | `clear arrows` | `borrá las flechas` | remove drawings |
 
 ## Guided tours
@@ -68,6 +68,8 @@ python voz/tour.py voz/tour_ejemplo.json
 ```
 
 See `voz/tour_ejemplo.json`. Coordinates are pixels on the monitor given by `x`, `y`, `w`, `h`.
+
+See `CHANGELOG.md` for everything done so far.
 
 ## Files
 
@@ -162,6 +164,8 @@ python voz/tour.py voz/tour_ejemplo.json
 ```
 
 Ver `voz/tour_ejemplo.json`. Las coordenadas son píxeles del monitor indicado por `x`, `y`, `w`, `h`.
+
+En `CHANGELOG.md` está todo lo hecho hasta ahora.
 
 ## Archivos
 
