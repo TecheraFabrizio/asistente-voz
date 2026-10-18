@@ -16,6 +16,10 @@ import numpy as np
 import sounddevice as sd
 from pathlib import Path
 from faster_whisper import WhisperModel
+# detector de voz (Silero, viene con faster-whisper): distingue habla de ruido en 1 a 6 ms.
+# medido 17-oct: silencio y ruido blanco -> no; voz, incluso 20 veces mas baja -> si
+from faster_whisper.vad import VadOptions, get_speech_timestamps
+VAD = VadOptions(threshold=0.5, min_speech_duration_ms=80, min_silence_duration_ms=100)
 
 CARPETA = Path(__file__).parent
 SALIDA = CARPETA / "entrada.txt"
@@ -276,10 +280,8 @@ def main():
                     if dur_voz < 0.15:
                         continue            # un golpe, un click: no es una palabra. "done" dura 0.3 s (medido)
                     rms = float(np.sqrt(np.mean(audio ** 2)))
-                    if corto and rms < 0.007:
-                        # clip corto y casi mudo: ruido de fondo que whisper convierte en "go." o "done." (medido 17-oct:
-                        # ruido 0.004-0.006, "go"/"done" reales 0.008-0.056). sin esto, cada uno pita
-                        continue
+                    if not get_speech_timestamps(audio, VAD):
+                        continue            # hubo sonido pero no es una voz: no se transcribe ni pita
                     if corto:
                         # relleno con silencio: whisper inventa menos con clips cortos
                         pad = np.zeros(int(FS * 0.4), dtype=np.float32)
