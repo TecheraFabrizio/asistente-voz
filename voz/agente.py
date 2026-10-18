@@ -76,6 +76,7 @@ class Agente(tk.Canvas):
         self._job = None
         self._item = self.create_image(0, 0, anchor="nw")
         self.bbox_visible = (0, 0, self.w, self.h)     # donde esta el dibujo dentro del cuadro (cambia por frame)
+        self.bbox_anim = (0, 0, self.w, self.h)        # idem, pero de toda la animacion en curso (estable)
         self.bind("<Button-1>", lambda e: self.modo("click", forzar=True))
         if al_cambiar:
             self.bind("<Button-3>", lambda e: al_cambiar(siguiente(self.nombre)))
@@ -118,6 +119,10 @@ class Agente(tk.Canvas):
         opciones = [o for o in opciones if o in self.datos["animations"]] or list(self.datos["animations"])[:1]
         self._anim = self.datos["animations"][random.choice(opciones)]["frames"]
         self._i = 0
+        # caja que abarca todos los frames de esta animacion: la nube se ancla a eso y no tiembla
+        cajas = [self._cuadro(fr["images"])[1] for fr in self._anim if fr.get("images")]
+        if cajas:
+            self.bbox_anim = (min(c[0] for c in cajas), min(c[1] for c in cajas), max(c[2] for c in cajas), max(c[3] for c in cajas))
         self._paso()
 
     def _paso(self):
@@ -135,7 +140,7 @@ class Agente(tk.Canvas):
 
     def cabeza(self):
         # punto arriba del centro de la cabeza, en coordenadas del canvas. la nube apunta aca
-        l, t, r, b = self.bbox_visible
+        l, t, r, b = self.bbox_anim
         return ((l + r) // 2, t)
 
     def destruir(self):

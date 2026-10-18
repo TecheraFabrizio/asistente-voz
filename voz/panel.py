@@ -164,6 +164,8 @@ class Globo(tk.Canvas):
 KEY = "#ff00fe"
 nube = tk.Toplevel(root); nube.overrideredirect(True); nube.attributes("-topmost", True)
 nube.attributes("-transparentcolor", KEY); nube.configure(bg=KEY); nube.withdraw()
+nube.attributes("-alpha", 0.82)       # un poco transparente, que no pese tanto
+_nube_pos = [None]
 l_burbuja = Globo(nube); l_burbuja.pack()
 def _ubicar_nube():
     # centrada sobre el personaje, pegada a su cabeza
@@ -174,7 +176,10 @@ def _ubicar_nube():
     x = int(flot.winfo_x() + hx - tx)
     y = int(flot.winfo_y() + hy - ty - 4)
     x = max(0, min(x, root.winfo_screenwidth() - W))      # que no se salga de la pantalla
-    nube.geometry(f"{W}x{H}+{x}+{max(y, 0)}")
+    y = max(y, 0)
+    p = _nube_pos[0]
+    if p is None or p[2] != (W, H) or abs(p[0] - x) > 6 or abs(p[1] - y) > 6:
+        nube.geometry(f"{W}x{H}+{x}+{y}"); _nube_pos[0] = (x, y, (W, H))   # se mueve solo si vale la pena
 _burbuja = {"texto": "", "desde": 0.0}
 def _refrescar_burbuja():
     import time as _t
