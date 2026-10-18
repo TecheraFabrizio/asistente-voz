@@ -269,8 +269,9 @@ def main():
                     # clip corto ("va", "listo"): idioma fijo, que no adivine con una palabra.
                     # frase larga: whisper detecta solo si hablaste en español o en ingles y lo escribe en ese idioma
                     if corto:
-                        # sin prompt: con "go ... done" en el prompt, el ruido salia transcripto como "go." o "done."
-                        idioma, prompt = LANG, None
+                        # con prompt: sin el, "go" sale como "You" u "Okay" (medido 17-oct 22:16).
+                        # el ruido que sale como "go." se frena con el minimo de 0.3 s y el volumen
+                        idioma, prompt = LANG, CFG.t("prompt_whisper")
                     else:
                         idioma, prompt = None, "va. listo. go. done."
                     segs, info = modelo.transcribe(audio, language=idioma, beam_size=5,
