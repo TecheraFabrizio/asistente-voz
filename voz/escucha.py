@@ -285,9 +285,14 @@ def main():
                     if dur_voz < 0.15:
                         continue            # un golpe, un click: no es una palabra. "done" dura 0.3 s (medido)
                     rms = float(np.sqrt(np.mean(audio ** 2)))
-                    # el detector de voz rechazo clips reales (uno de 0.5 s a volumen 0.083, 17-oct 23:45), asi que
-                    # solo ayuda: un clip pasa si tiene volumen (ruido medido: 0.004-0.006) o si el detector dice que es voz
-                    es_voz = rms >= 0.0065 or bool(get_speech_timestamps(audio, VAD))
+                    # medido 18-oct sobre 16 clips reales: el sonido del juego y otros ruidos fuertes (volumen hasta 0.086)
+                    # dan detector = 0 y whisper los convierte en "listo." por culpa del prompt; la voz real da detector > 0.3.
+                    # por eso: clips de 0.4 s o mas pasan solo si el detector encuentra voz; los muy cortos ("go", "done")
+                    # el detector los duda, y ahi decide el volumen (ruido 0.004-0.006, "go" real desde 0.007)
+                    if dur_voz >= 0.4:
+                        es_voz = bool(get_speech_timestamps(audio, VAD))
+                    else:
+                        es_voz = rms >= 0.0065
                     if not es_voz:
                         print(f"[no es voz {dur_voz:.1f}s rms={rms:.3f}]")
                         continue            # hubo sonido pero no es una voz: no se transcribe ni pita
