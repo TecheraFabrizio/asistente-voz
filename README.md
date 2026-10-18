@@ -27,7 +27,11 @@ start.bat        # Windows
 ./start.sh       # Linux / macOS
 ```
 
-No IDE needed: Claude Code runs in that terminal. VS Code is optional. By hand:
+No IDE needed: Claude Code runs in that terminal. VS Code is optional.
+
+The scripts start Claude Code with `--dangerously-skip-permissions`, so nothing stops to ask for permission: that is what makes it hands-free. It also means Claude can run any command on that machine without asking. If you want prompts, remove the flag, or use `--permission-mode acceptEdits` plus an allow list in `.claude/settings.json`.
+
+By hand:
 
 ```
 pip install -r requirements.txt
@@ -119,7 +123,11 @@ start.bat        # Windows
 ./start.sh       # Linux / macOS
 ```
 
-No hace falta IDE: Claude Code corre en esa terminal. VS Code es opcional. A mano:
+No hace falta IDE: Claude Code corre en esa terminal. VS Code es opcional.
+
+Los scripts arrancan Claude Code con `--dangerously-skip-permissions`, así nada se frena a pedir permiso: eso es lo que lo hace manos libres. También significa que Claude puede correr cualquier comando en esa máquina sin preguntar. Si preferís que pregunte, sacá la opción, o usá `--permission-mode acceptEdits` más una lista de permitidos en `.claude/settings.json`.
+
+A mano:
 
 ```
 pip install -r requirements.txt
