@@ -1,5 +1,5 @@
 # Idioma del asistente. Lo leen escucha, panel, hablar y el hook.
-# config.json: {"lang": "es"}  o  {"lang": "en"}
+# config.json: {"lang": "en"}  o  {"lang": "es"}   (ingles por defecto)
 # Cambiar: python voz/config.py en   |  python voz/config.py es
 
 import json, sys
@@ -9,9 +9,9 @@ ARCHIVO = Path(__file__).parent / "config.json"
 
 def lang():
     try:
-        return json.loads(ARCHIVO.read_text(encoding="utf-8")).get("lang", "es")
+        return json.loads(ARCHIVO.read_text(encoding="utf-8")).get("lang", "en")
     except Exception:
-        return "es"
+        return "en"
 
 def _leer():
     try:
@@ -58,7 +58,7 @@ T = {
 }
 
 def t(clave):
-    return T.get(lang(), T["es"]).get(clave, T["es"][clave])
+    return T.get(lang(), T["en"]).get(clave, T["en"][clave])
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] in ("es", "en"):

@@ -5,7 +5,7 @@
 Talk to Claude Code without touching the keyboard. Whisper transcribes locally on the GPU, Claude fixes the transcript from context and acts.
 On-screen status panel with live steps, a formatted answer panel, spoken narration, and step-by-step guided tours with arrows and labels drawn over any application.
 
-Default language is Spanish. Switch to English with one click on the panel. Voice commands are accepted in both languages at all times, and dictation is language-agnostic: Whisper detects whether you spoke Spanish or English and writes it in that language.
+Default language is English. Switch to Spanish with one click on the panel. Voice commands are accepted in both languages at all times, and dictation is language-agnostic: Whisper detects whether you spoke Spanish or English and writes it in that language.
 
 ## What you get
 
@@ -22,7 +22,7 @@ Default language is Spanish. Switch to English with one click on the panel. Voic
 
 ```
 pip install -r requirements.txt
-python voz/config.py en        # or: es  (default)
+python voz/config.py en        # default. or: es
 python voz/escucha.py          # mic listener (GPU)
 pythonw voz/panel.py           # status + answer panel (Linux/Mac: python voz/panel.py &)
 ```
@@ -88,7 +88,7 @@ Tested on Windows 11. Linux and macOS support is written against the platform AP
 Le hablás a Claude Code sin tocar el teclado. Whisper transcribe local en la GPU, Claude corrige con contexto y actúa.
 Panel de estado con los pasos en vivo, panel de respuesta formateado, narración en voz alta y recorridos guiados con flechas y carteles sobre cualquier aplicación.
 
-Idioma por defecto: español. Se pasa a inglés con un click en el panel. Los comandos de voz se aceptan en los dos idiomas siempre, y el dictado es mixto: Whisper detecta si hablaste en español o en inglés y lo escribe en ese idioma.
+Idioma por defecto: inglés. Se pasa a español con un click en el panel. Los comandos de voz se aceptan en los dos idiomas siempre, y el dictado es mixto: Whisper detecta si hablaste en español o en inglés y lo escribe en ese idioma.
 
 ## Qué hace
 
@@ -105,7 +105,7 @@ Idioma por defecto: español. Se pasa a inglés con un click en el panel. Los co
 
 ```
 pip install -r requirements.txt
-python voz/config.py es        # o: en
+python voz/config.py es        # el default es en
 python voz/escucha.py          # escucha el mic (GPU)
 pythonw voz/panel.py           # panel de estado y respuesta (Linux/Mac: python voz/panel.py &)
 ```
