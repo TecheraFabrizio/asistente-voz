@@ -10,13 +10,33 @@ LINUX = not WIN and not MAC
 
 _NADA = dict(stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
+def linea_de_comando(pid):
+    # con que comando arranco ese proceso ("" si no existe)
+    try:
+        if WIN:
+            r = subprocess.run(["powershell", "-NoProfile", "-Command",
+                                f"(Get-CimInstance Win32_Process -Filter 'ProcessId={int(pid)}').CommandLine"],
+                               capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
+            return r.stdout.strip()
+        if LINUX:
+            return open(f"/proc/{int(pid)}/cmdline", "rb").read().replace(b"\0", b" ").decode(errors="ignore")
+        r = subprocess.run(["ps", "-p", str(int(pid)), "-o", "command="], capture_output=True, text=True)
+        return r.stdout.strip()
+    except Exception:
+        return ""
+
 def unica_instancia(nombre, carpeta):
     # si ya habia una copia corriendo (restart a medias, doble click), la mata: dos paneles encimados confunden
+    # ojo: el pid viejo puede haber sido reutilizado por otro proceso (18-oct: le toco a la consola que lanzaba
+    # el panel nuevo, y matarla con sus hijos mato al panel recien nacido). solo se mata si es de verdad este script
     pidf = os.path.join(carpeta, f"_{nombre}.pid")
     try:
         viejo = int(open(pidf).read().strip())
-        if viejo != os.getpid():
-            matar(viejo)
+        if viejo != os.getpid() and nombre in linea_de_comando(viejo):
+            if WIN:
+                subprocess.run(["taskkill", "/F", "/PID", str(viejo)], **_NADA)   # sin /T: solo ese proceso
+            else:
+                os.kill(viejo, signal.SIGKILL)
     except Exception:
         pass
     try:
