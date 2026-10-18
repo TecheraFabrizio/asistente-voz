@@ -214,9 +214,17 @@ agente = None
 flot = tk.Toplevel(root); flot.overrideredirect(True); flot.attributes("-topmost", True)
 flot.attributes("-transparentcolor", KEY); flot.configure(bg=KEY); flot.withdraw()
 _dock = {"anclado": True, "ult": None, "visto": False}
-_arr = {"x": 0, "y": 0, "wx": 0, "wy": 0, "mov": False}
+_arr = {"x": 0, "y": 0, "wx": 0, "wy": 0, "mov": False, "abajo": False}
+def _encima():
+    # entre ventanas topmost, "lift" no reordena en Windows: volver a poner topmost si las sube
+    for win in (flot, nube):
+        try:
+            if win.state() == "normal":
+                win.attributes("-topmost", False); win.attributes("-topmost", True)
+        except Exception:
+            pass
 def _p_ini(e):
-    _arr.update(x=e.x_root, y=e.y_root, wx=flot.winfo_x(), wy=flot.winfo_y(), mov=False)
+    _arr.update(x=e.x_root, y=e.y_root, wx=flot.winfo_x(), wy=flot.winfo_y(), mov=False, abajo=True)
 def _p_mov(e):
     dx, dy = e.x_root - _arr["x"], e.y_root - _arr["y"]
     if abs(dx) > 4 or abs(dy) > 4:
@@ -224,10 +232,13 @@ def _p_mov(e):
     if _arr["mov"]:
         _dock["anclado"] = False
         flot.geometry(f"+{_arr['wx'] + dx}+{_arr['wy'] + dy}")
-        _ubicar_nube()
+        _ubicar_nube()          # sin tocar topmost aca: reapilar la ventana corta el arrastre
 def _p_fin(e):
+    _arr["abajo"] = False
     if not _arr["mov"] and agente is not None:
         agente.modo("click", forzar=True)      # click sin arrastre: un gesto
+    else:
+        _encima()                              # soltado: que quede por encima del panel de respuesta
 def _p_volver(e):
     _dock["anclado"] = True; _dock["ult"] = None; _ubicar_personaje()
 def _ubicar_personaje():
@@ -461,6 +472,8 @@ def refrescar():
     _ver(not OCULTO.exists())
     _ubicar_personaje()
     _refrescar_burbuja()
+    if tick % 8 == 0 and _visible[0] and _dock["visto"] and not _arr["abajo"]:
+        _encima()
     r = leer(RESP)
     if r:
         abrir_modal(r)
