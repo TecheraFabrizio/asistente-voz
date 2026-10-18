@@ -22,6 +22,7 @@ MODOS = {
         "listo": ["Congratulate", "CharacterSucceeds", "Pleased"],
         "click": ["ClickedOn", "Sports", "Cooking", "Travel", "Money", "Shopping", "Celebrity", "Surprised",
                   "Embarrassed", "Acknowledge", "Greet", "GestureLeft"],
+        "saludo": ["Greet"],
     },
     "Merlin": {
         "trabajando": ["Processing", "Searching", "Writing", "Thinking", "Reading", "DoMagic1", "Read"],
@@ -29,6 +30,7 @@ MODOS = {
         "listo": ["Congratulate", "Pleased", "DoMagic2", "Congratulate_2"],
         "click": ["Wave", "DoMagic1", "DoMagic2", "GestureUp", "Surprised", "Confused", "Explain", "Announce",
                   "Greet", "Alert", "Suggest", "Sad"],
+        "saludo": ["Greet", "Wave"],
     },
     "Clippy": {
         "trabajando": ["Searching", "Thinking", "Writing", "Processing", "CheckingSomething", "GetTechy", "Print"],
@@ -37,6 +39,7 @@ MODOS = {
         "listo": ["Congratulate", "Wave", "GetArtsy"],
         "click": ["Wave", "Greeting", "Alert", "Explain", "GetArtsy", "GetWizardy", "EmptyTrash", "SendMail",
                   "Save", "GestureUp", "GestureDown", "GoodBye"],
+        "saludo": ["Greeting", "Wave"],
     },
 }
 
@@ -49,6 +52,11 @@ TRABAJO = {
     "comando":  {"Rover": ["Thinking", "GetAttention"], "Merlin": ["Processing", "DoMagic1"], "Clippy": ["Processing", "GetTechy"]},
     "pensar":   {"Rover": ["Thinking"], "Merlin": ["Thinking"], "Clippy": ["Thinking"]},
     "chrome":   {"Rover": ["ImageSearching"], "Merlin": ["Searching"], "Clippy": ["GetTechy"]},
+    # estados del microfono: es la cara del asistente
+    "escuchar": {"Rover": ["GetAttentionMinor", "LookUp", "Acknowledge"], "Merlin": ["Hearing_1", "Hearing_2", "Hearing_3", "StartListening"],
+                 "Clippy": ["Hearing_1", "Alert", "LookUp"]},
+    "anotar":   {"Rover": ["Writing"], "Merlin": ["Write", "Writing"], "Clippy": ["Writing"]},
+    "esperar":  {"Rover": ["LookUp", "LookUpLeft", "Idle"], "Merlin": ["LookUp", "Think", "Uncertain"], "Clippy": ["IdleEyeBrowRaise", "LookUp", "IdleFingerTap"]},
 }
 
 def siguiente(nombre):
@@ -71,6 +79,7 @@ class Agente(tk.Canvas):
         self.cache = {}
         self._modo = "quieto"
         self._tipo = ""              # clase de trabajo en curso (leer, escribir, ...)
+        self._festejar = True        # al terminar de trabajar festeja; al terminar de escuchar, no
         self._anim = None
         self._i = 0
         self._job = None
@@ -103,8 +112,9 @@ class Agente(tk.Canvas):
             self._modo = m
             self._siguiente_anim()
 
-    def trabajar(self, tipo):
-        # trabajando en algo concreto: la animacion acompaña (lee, escribe, busca...)
+    def trabajar(self, tipo, festejar=True):
+        # trabajando en algo concreto: la animacion acompaña (lee, escribe, busca, escucha...)
+        self._festejar = festejar
         tipo = tipo if tipo in TRABAJO else ""
         if self._modo != "trabajando" or tipo != self._tipo:
             self._modo, self._tipo = "trabajando", tipo
@@ -128,7 +138,7 @@ class Agente(tk.Canvas):
     def _paso(self):
         if self._i >= len(self._anim):
             # termino: si era un gesto puntual (click / listo), vuelvo a quieto; si no, otra del mismo modo
-            if self._modo in ("listo", "click"):
+            if self._modo in ("listo", "click", "saludo"):
                 self._modo = "quieto"
             self._siguiente_anim(); return
         f = self._anim[self._i]

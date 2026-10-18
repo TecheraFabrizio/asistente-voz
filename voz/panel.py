@@ -271,6 +271,7 @@ def _crear_agente(nombre):
         agente.bind("<Button-1>", _p_ini); agente.bind("<B1-Motion>", _p_mov)
         agente.bind("<ButtonRelease-1>", _p_fin); agente.bind("<Double-Button-1>", _p_volver)
         _dock["ult"] = None
+        agente.modo("saludo", forzar=True)      # saluda al aparecer y al cambiar de personaje
     except Exception:
         agente = None
 def _cambiar_agente(nombre):
@@ -475,7 +476,13 @@ def refrescar():
         if agente: agente.trabajar(leer(C / "tipo.txt").strip())
     else:
         l_accion.configure(text="")
-        if agente and agente._modo == "trabajando": agente.modo("listo")
+        if agente:
+            # sin trabajo: el personaje es la cara del microfono. escucha cuando hablas, anota, espera el "listo"
+            cara = {"grabando": "escuchar", "transcribiendo": "anotar", "dictando": "esperar"}.get(e)
+            if cara:
+                agente.trabajar(cara, festejar=False)
+            elif agente._modo == "trabajando":
+                agente.modo("listo" if agente._festejar else "quieto")
     poner(leer(DICTADO))
     _ver(not OCULTO.exists())
     _ubicar_personaje()
