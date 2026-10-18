@@ -70,7 +70,8 @@ AL_OIDO = [
 HABLAR = CARPETA / "hablar.txt"        # si claude escribe algo aca, se dice en voz alta y se borra
 # "borrá las flechas / el dibujo" cierra los overlays directo
 # "assistant hide" / "assistant show" (o "asistente ocultar" / "asistente mostrar") esconden y traen el panel
-OCULTAR = re.compile(r"^\W*((assistant|asistente)\W+(hide|ocult\w*)|(hide|ocult\w*)\W+(the\s+|el\s+)?(assistant|asistente))\W*$", re.I)
+# "hi, the assistant" y "high the assistant" son "hide the assistant" mal oido
+OCULTAR = re.compile(r"^\W*((assistant|asistente)\W+(hide|hi|high|ocult\w*)|(hide|hi|high|ocult\w*)\W+(the\s+|el\s+)?(assistant|asistente))\W*$", re.I)
 MOSTRAR = re.compile(r"^\W*((assistant|asistente)\W+(show|mostr\w*)|(show|mostr\w*)\W+(the\s+|el\s+)?(assistant|asistente))\W*$", re.I)
 OCULTO = CARPETA / "oculto"             # si existe, el panel se esconde
 BORRAR = re.compile(r"^\W*(borr\w*|sac\w*|quit\w*|cerr\w*|vora|clear|remove|delete|erase|hide)\b.{0,25}\b(flecha\w*|dibujo\w*|marca\w*|gr[aá]fico\w*|cartel\w*|arrow\w*|drawing\w*|mark\w*|overlay\w*)\b.{0,10}$", re.I)
