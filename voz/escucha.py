@@ -54,7 +54,7 @@ VER = re.compile(r"^\W*(ver|mostr\w*|abr\w*|abre|show|open|display)\w*\b.{0,25}\
 NARRAR = re.compile(r"^\W*(narr[aá]lo|narr[aá]melo|narralo|d[aá]ramelo|n[aá]rramelo|narramelo|arr[aá]melo|\w{0,2}arr[aá]melo"
                     r"|\w{0,3}\s?r+[aá]\s?m[ei]\s?lo"      # "a rami lo", "arrámelo", "dárame lo": como sea que whisper lo escriba
                     r"|explic[aá]lo|explic[aá]melo|l[eé]+lo|l[eé]+melo|cont[aá]melo|contalo"
-                    r"|narrate( it)?( to me)?|read (it|that|this|the (text|answer|modal|panel|response))( to me| in the (modal|panel))?|read me the (text|answer)|explain( it)?|tell me)\W*$", re.I)
+                    r"|narrat(e|es|ed|ing)( it)?( to me)?|narration|read (it|that|this|the (text|answer|modal|panel|response))( to me| in the (modal|panel))?|read me the (text|answer)|explain( it)?|tell me)\W*$", re.I)
 # "callate" / "shut up" corta la narracion
 CALLAR = re.compile(r"^\W*(call[aá]te|c[aá]llate|par[aá]|basta|silencio|stop|shut up|quiet|be quiet|silence)\W*$", re.I)
 NARRACION = CARPETA / "narracion.txt"
