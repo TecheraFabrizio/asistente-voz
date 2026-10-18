@@ -43,7 +43,8 @@ FIN = re.compile(r"[\s,.:!¡]*\b(listo|lito|listos|liston|visto|done|dun|ready|s
 # "cancela" / "cancel" tira el dictado
 CANCEL = re.compile(r"^\W*(cancel[aá]|cancelar|olvidalo|olv[ií]dalo|cancel|never mind|nevermind|forget it)\W*$", re.I)
 # "cerralo" cierra el modal de respuesta
-CERRAR = re.compile(r"^\W*(cerralo|cerrarlo|cerr[aá]|cerrar|cierra|cierralo|ci[eé]rralo|ok|okey|dale|close|dismiss)"
+# "ok" y "dale" ya no cierran: son muletillas y cerraban el modal sin querer
+CERRAR = re.compile(r"^\W*(cerralo|cerrarlo|cerr[aá]|cerrar|cierra|cierralo|ci[eé]rralo|close|dismiss)"
                     r"(\s+(el|la|ese|esa|eso|esto|it|the|that|this)?\s*(modal|ventana|respuesta|cartel|window|answer|response|popup)?)?\W*$", re.I)
 RESPUESTA = CARPETA / "respuesta.txt"
 ULTIMA = CARPETA / "ultima_respuesta.txt"   # la guarda el panel; "ver respuesta" la vuelve a abrir
