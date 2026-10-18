@@ -17,6 +17,17 @@ import config as CFG
 def nombre(p):
     return os.path.basename(str(p)) if p else ""
 
+def tipo_de(tool):
+    # que clase de trabajo es: el personaje elige la animacion con esto
+    if tool in ("Bash", "PowerShell"): return "comando"
+    if tool in ("Edit", "Write", "NotebookEdit"): return "escribir"
+    if tool == "Read": return "leer"
+    if tool in ("Grep", "Glob"): return "buscar"
+    if tool in ("WebSearch", "WebFetch"): return "web"
+    if tool == "Agent": return "pensar"
+    if tool.startswith("mcp__claude-in-chrome"): return "chrome"
+    return "comando"
+
 def paso_de(tool, inp):
     # arma una linea corta y en castellano segun la herramienta
     d = inp.get("description") or ""
@@ -49,6 +60,7 @@ def main():
         data = {}
     if ev == "stop":
         ACCION.write_text("", encoding="utf-8")
+        (ACCION.parent / "tipo.txt").write_text("", encoding="utf-8")
         (ACCION.parent / "burbuja.txt").write_text(CFG.t("listo"), encoding="utf-8")   # el personaje lo dice en su globo
         # si la orden vino por voz, avisa hablando que termino
         flag = ACCION.parent / "orden_pendiente"
@@ -65,6 +77,7 @@ def main():
         (ACCION.parent / "burbuja.txt").write_text(CFG.t("procesando"), encoding="utf-8")
         return
     paso = paso_de(data.get("tool_name", ""), data.get("tool_input", {}) or {})
+    (ACCION.parent / "tipo.txt").write_text(tipo_de(data.get("tool_name", "")), encoding="utf-8")
     try:
         lineas = ACCION.read_text(encoding="utf-8").splitlines()
     except Exception:

@@ -464,7 +464,7 @@ def refrescar():
     if pasos:
         lineas = ["✓ " + p for p in pasos[:-1]] + [SPIN[tick % len(SPIN)] + " " + pasos[-1]]
         l_accion.configure(text="\n".join(lineas))
-        if agente: agente.modo("trabajando")
+        if agente: agente.trabajar(leer(C / "tipo.txt").strip())
     else:
         l_accion.configure(text="")
         if agente and agente._modo == "trabajando": agente.modo("listo")
