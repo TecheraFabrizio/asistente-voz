@@ -283,6 +283,7 @@ def main():
                     corto = dur_voz < CORTO
                     audio_crudo = audio
                     if dur_voz < 0.15:
+                        estado("escuchando")   # si no, el panel queda en "transcribiendo"
                         continue            # un golpe, un click: no es una palabra. "done" dura 0.3 s (medido)
                     rms = float(np.sqrt(np.mean(audio ** 2)))
                     # medido 18-oct sobre 16 clips reales: el sonido del juego y otros ruidos fuertes (volumen hasta 0.086)
@@ -295,6 +296,7 @@ def main():
                         es_voz = rms >= 0.0065
                     if not es_voz:
                         print(f"[no es voz {dur_voz:.1f}s rms={rms:.3f}]")
+                        estado("escuchando")
                         continue            # hubo sonido pero no es una voz: no se transcribe ni pita
                     if corto:
                         # relleno con silencio: whisper inventa menos con clips cortos
