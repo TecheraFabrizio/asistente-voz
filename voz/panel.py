@@ -118,8 +118,31 @@ l_estado = tk.Label(fila, text="...", fg=TEXTO, bg=FONDO, font=("Consolas", 11))
 
 # globo de dialogo del personaje: burbuja.txt tiene el texto; vacio = escondido. se borra solo a los 20 s
 BURBUJA = C / "burbuja.txt"
-l_burbuja = tk.Label(cuerpo, text="", fg=TEXTO, bg="#2a3442", font=("Segoe UI", 10), wraplength=300,
-                     justify="left", padx=10, pady=5, highlightthickness=1, highlightbackground=ACENTO)
+class Globo(tk.Canvas):
+    # globo de historieta: rectangulo redondeado con una colita que apunta al personaje (abajo a la derecha)
+    FUENTE = ("Segoe UI", 10)
+    ANCHO_MAX, PAD, COLA, R = 290, 10, 12, 14
+    def __init__(self, padre):
+        super().__init__(padre, bg=FONDO, highlightthickness=0)
+    def mostrar(self, texto):
+        self.delete("all")
+        t = self.create_text(0, 0, text=texto, font=self.FUENTE, fill=TEXTO, anchor="nw", width=self.ANCHO_MAX)
+        x1, y1, x2, y2 = self.bbox(t)
+        tw, th = x2 - x1, y2 - y1
+        w, h = tw + 2 * self.PAD + 2, th + 2 * self.PAD
+        self.configure(width=w + 2, height=h + self.COLA + 2)
+        r, P = self.R, []
+        # contorno redondeado: puntos en las esquinas, smooth los curva
+        for cx, cy, sx, sy in ((1 + r, 1 + r, -1, -1), (w - r, 1 + r, 1, -1), (w - r, h - r, 1, 1), (1 + r, h - r, -1, 1)):
+            P += [(cx + sx * r, cy), (cx + sx * r, cy + sy * r), (cx, cy + sy * r)]
+        pts = [P[1], P[2], P[3], P[4], P[5], P[6], P[7], P[8], P[9], P[10], P[11], P[0]]
+        cola = [(w - 46, h - 1), (w - 22, h + self.COLA), (w - 26, h - 1)]
+        self.create_polygon(cola, fill="#2a3442", outline=ACENTO, width=1)
+        self.create_polygon(pts, smooth=True, fill="#2a3442", outline=ACENTO, width=1)
+        # tapa el borde entre el globo y la colita
+        self.create_line(w - 44, h - 1, w - 28, h - 1, fill="#2a3442", width=3)
+        self.coords(t, 1 + self.PAD, 1 + self.PAD); self.tag_raise(t)
+l_burbuja = Globo(cuerpo)
 _burbuja = {"texto": "", "desde": 0.0}
 def _refrescar_burbuja():
     import time as _t
@@ -136,11 +159,13 @@ def _refrescar_burbuja():
         if e in ("grabando", "transcribiendo", "dictando"):
             txt = CFG.t("b_" + e)
     if txt:
-        l_burbuja.configure(text=txt)
-        # pegado arriba del personaje, a la derecha de la fila de estado
-        l_burbuja.place(in_=fila, relx=1.0, x=0, y=-2, anchor="ne")
-        l_burbuja.lift()
+        if txt != _burbuja.get("pintado"):
+            l_burbuja.mostrar(txt); _burbuja["pintado"] = txt
+        # pegado arriba del personaje, a la derecha de la fila de estado; la colita apunta al personaje
+        l_burbuja.place(in_=fila, relx=1.0, x=-6, y=-6, anchor="ne")
+        tk.Misc.lift(l_burbuja)      # Canvas.lift es para items; este es el widget
     else:
+        _burbuja["pintado"] = ""
         l_burbuja.place_forget()
 
 # pasos de claude: una linea por paso, los hechos con ✓, el actual con spinner
