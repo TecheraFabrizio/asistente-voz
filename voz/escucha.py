@@ -152,6 +152,26 @@ def callar():
         SO.matar_por_nombre("_paso.json")
     FLAG_HABLANDO.unlink(missing_ok=True)
 
+def narrar():
+    # lee en voz alta lo ultimo que dejo claude.
+    # si hay una version hablada (narracion.txt) mas nueva que el modal, va esa.
+    # si no, lee el modal limpiando formato y traduciendo siglas al oido.
+    txt = ""
+    cand = [a for a in (NARRACION, RESPUESTA, ULTIMA) if a.exists() and a.read_text(encoding="utf-8").strip()]
+    if cand:
+        cand.sort(key=lambda a: a.stat().st_mtime, reverse=True)
+        # narracion gana si es tan nueva como el modal (menos de 2 min de diferencia)
+        if NARRACION in cand and (cand[0] == NARRACION or NARRACION.stat().st_mtime >= cand[0].stat().st_mtime - 120):
+            txt = NARRACION.read_text(encoding="utf-8")
+        else:
+            txt = cand[0].read_text(encoding="utf-8")
+    txt = re.sub(r"\*\*(.+?)\*\*", r"\1", txt)
+    txt = re.sub(r"^#+\s*", "", txt, flags=re.M)
+    txt = re.sub(r"^\s*[-•]\s*", "", txt, flags=re.M)
+    for a, b in AL_OIDO:
+        txt = re.sub(a, b, txt)
+    decir(txt.strip() or CFG.t("nada_narrar"))
+
 def main():
     args = sys.argv[1:]
     if "--listar" in args:
@@ -243,10 +263,22 @@ def main():
                         # relleno con silencio: whisper inventa menos con clips cortos
                         pad = np.zeros(int(FS * 0.4), dtype=np.float32)
                         audio = np.concatenate([pad, audio, pad])
-                    segs, _ = modelo.transcribe(audio, language=LANG, beam_size=5,
-                                                vad_filter=False, condition_on_previous_text=False,
-                                                initial_prompt=CFG.t("prompt_whisper"))
+                    # clip corto ("va", "listo"): idioma fijo, que no adivine con una palabra.
+                    # frase larga: whisper detecta solo si hablaste en español o en ingles y lo escribe en ese idioma
+                    if corto:
+                        idioma, prompt = LANG, CFG.t("prompt_whisper")
+                    else:
+                        idioma, prompt = None, "va. listo. go. done."
+                    segs, info = modelo.transcribe(audio, language=idioma, beam_size=5,
+                                                   vad_filter=False, condition_on_previous_text=False,
+                                                   initial_prompt=prompt)
                     texto = " ".join(s.text for s in segs).strip()
+                    if not corto and info.language not in ("es", "en"):
+                        # detecto otra cosa (ruido, musica): vuelvo al idioma configurado
+                        segs, info = modelo.transcribe(audio, language=LANG, beam_size=5,
+                                                       vad_filter=False, condition_on_previous_text=False,
+                                                       initial_prompt=CFG.t("prompt_whisper"))
+                        texto = " ".join(s.text for s in segs).strip()
                     texto = ECO_PROMPT.sub(" ", texto).strip()   # saca el eco del prompt
                     dt = time.time() - t0
                     if not texto:
@@ -255,7 +287,7 @@ def main():
                     hora = time.strftime("%H:%M:%S")
                     with LOG.open("a", encoding="utf-8") as f:
                         f.write(f"{hora} | {texto}\n")
-                    print(f"[{dt:.2f}s] {texto}")
+                    print(f"[{dt:.2f}s {info.language}] {texto}")
 
                     ahora = time.time()
                     m = WAKE.match(texto)
@@ -275,23 +307,7 @@ def main():
                             continue
 
                     if dictado is None and NARRAR.match(texto):
-                        # si claude dejo una version hablada (narracion.txt) mas nueva que el modal, va esa.
-                        # si no, lee el modal limpiando formato y traduciendo siglas al oido.
-                        txt = ""
-                        cand = [a for a in (NARRACION, RESPUESTA, ULTIMA) if a.exists() and a.read_text(encoding="utf-8").strip()]
-                        if cand:
-                            cand.sort(key=lambda a: a.stat().st_mtime, reverse=True)
-                            # narracion gana si es tan nueva como el modal (menos de 2 min de diferencia)
-                            if NARRACION in cand and (cand[0] == NARRACION or NARRACION.stat().st_mtime >= cand[0].stat().st_mtime - 120):
-                                txt = NARRACION.read_text(encoding="utf-8")
-                            else:
-                                txt = cand[0].read_text(encoding="utf-8")
-                        txt = re.sub(r"\*\*(.+?)\*\*", r"\1", txt)
-                        txt = re.sub(r"^#+\s*", "", txt, flags=re.M)
-                        txt = re.sub(r"^\s*[-•]\s*", "", txt, flags=re.M)
-                        for a, b in AL_OIDO:
-                            txt = re.sub(a, b, txt)
-                        decir(txt.strip() or CFG.t("nada_narrar"))
+                        narrar()
                         estado("escuchando")
                         continue
 
@@ -321,9 +337,10 @@ def main():
                             texto = texto[m.end():].strip()
                         elif mf:
                             texto = texto[:mf.start()].strip()
-                        elif corto and pocas:
+                        elif corto and pocas and not FIN.search(texto):
                             texto = ""
                         else:
+                            # un "listo" suelto o cualquier otra cosa sin "va": no es para mi
                             estado("escuchando")
                             continue
                         dictado = []
@@ -367,7 +384,10 @@ def main():
                     if fin or ahora - dictado_desde > MAX_DICTADO:
                         orden = " ".join(dictado).strip()
                         dictado = None
-                        if orden:
+                        if orden and NARRAR.match(orden):
+                            # "va, narramelo, listo": es un pedido de narrar, no una orden para claude
+                            narrar()
+                        elif orden:
                             enviar(hora, orden)
                         else:
                             beep(False)
