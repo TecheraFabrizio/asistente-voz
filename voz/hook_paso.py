@@ -21,23 +21,23 @@ def paso_de(tool, inp):
     # arma una linea corta y en castellano segun la herramienta
     d = inp.get("description") or ""
     if tool in ("Bash", "PowerShell"):
-        return d or "ejecutando comando"
+        return d or CFG.t("p_comando")
     if tool == "Edit":
-        return "editando " + nombre(inp.get("file_path"))
+        return CFG.t("p_editar") + nombre(inp.get("file_path"))
     if tool == "Write":
-        return "escribiendo " + nombre(inp.get("file_path"))
+        return CFG.t("p_escribir") + nombre(inp.get("file_path"))
     if tool == "Read":
-        return "leyendo " + nombre(inp.get("file_path"))
+        return CFG.t("p_leer") + nombre(inp.get("file_path"))
     if tool in ("Grep", "Glob"):
-        return "buscando " + str(inp.get("pattern", ""))[:40]
+        return CFG.t("p_buscar") + str(inp.get("pattern", ""))[:40]
     if tool == "Agent":
-        return "consultando: " + str(inp.get("description", ""))[:50]
+        return CFG.t("p_agente") + str(inp.get("description", ""))[:50]
     if tool == "Monitor":
-        return "vigilando " + str(inp.get("description", ""))[:50]
+        return CFG.t("p_vigilar") + str(inp.get("description", ""))[:50]
     if tool in ("WebSearch", "WebFetch"):
-        return "buscando en la web"
+        return CFG.t("p_web")
     if tool.startswith("mcp__claude-in-chrome"):
-        return "usando Chrome"
+        return CFG.t("p_chrome")
     return d or tool.lower()
 
 def main():

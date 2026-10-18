@@ -43,6 +43,11 @@ T = {
         "escuchando": "ESCUCHANDO", "grabando": "GRABANDO",
         "transcribiendo": "TRANSCRIBIENDO", "cargando": "CARGANDO",
         "titulo": "ASISTENTE PERSONAL", "respuesta": "RESPUESTA", "cerrar": "cerrar",
+        # pasos que muestra el panel mientras claude trabaja
+        "p_comando": "ejecutando comando", "p_editar": "editando ", "p_escribir": "escribiendo ",
+        "p_leer": "leyendo ", "p_buscar": "buscando ", "p_agente": "consultando: ", "p_vigilar": "vigilando ",
+        "p_web": "buscando en la web", "p_chrome": "usando Chrome",
+        "borrar_dibujos": "✕ borrar dibujos",
     },
     "en": {
         "voz": "en-US-GuyNeural",
@@ -54,6 +59,10 @@ T = {
         "escuchando": "LISTENING", "grabando": "RECORDING",
         "transcribiendo": "TRANSCRIBING", "cargando": "LOADING",
         "titulo": "PERSONAL ASSISTANT", "respuesta": "ANSWER", "cerrar": "close",
+        "p_comando": "running command", "p_editar": "editing ", "p_escribir": "writing ",
+        "p_leer": "reading ", "p_buscar": "searching ", "p_agente": "asking: ", "p_vigilar": "watching ",
+        "p_web": "searching the web", "p_chrome": "using Chrome",
+        "borrar_dibujos": "✕ clear drawings",
     },
 }
 

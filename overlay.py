@@ -18,6 +18,9 @@ JSON:
 }
 """
 import sys, json, ctypes, tkinter as tk, tkinter.font as tkfont
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent / "voz"))
+import config as CFG       # el texto del boton sale del idioma configurado
 
 # pixeles reales aunque Windows tenga escala 125%
 try:
@@ -77,7 +80,7 @@ def main():
     b.overrideredirect(True)
     b.attributes("-topmost", True)
     b.geometry(f"+{X + W - 190}+{Y + H - 90}")
-    tk.Button(b, text="✕ borrar dibujos", bg=FONDO, fg=TEXTO, activebackground="#333", activeforeground=TEXTO,
+    tk.Button(b, text=CFG.t("borrar_dibujos"), bg=FONDO, fg=TEXTO, activebackground="#333", activeforeground=TEXTO,
               font=f, relief="flat", padx=10, pady=4, command=root.destroy).pack()
 
     root.mainloop()
