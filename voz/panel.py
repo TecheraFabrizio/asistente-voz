@@ -141,9 +141,30 @@ _crear_agente(CFG.agente())
 marco = tk.Frame(cuerpo, bg=TENUE)
 marco.pack(fill="both", expand=True, padx=14, pady=(0, 14))
 t = tk.Text(marco, bg=PANEL, fg=TEXTO, font=("Segoe UI", 14), wrap="word",
-            relief="flat", padx=10, pady=8, state="disabled",
+            relief="flat", padx=10, pady=8,
             insertbackground=TEXTO, highlightthickness=0)
 t.pack(fill="both", expand=True, padx=1, pady=1)
+
+# la caja se puede corregir a mano: click, escribis, y lo que queda es lo que se manda
+ENVIAR_AHORA = C / "dictado_enviar"
+def _editado(e=None):
+    if t.focus_get() is t:
+        try:
+            DICTADO.write_text(t.get("1.0", "end-1c").strip(), encoding="utf-8")
+        except Exception:
+            pass
+def _enter(e):
+    _editado()
+    try:
+        ENVIAR_AHORA.write_text("1", encoding="utf-8")
+    except Exception:
+        pass
+    root.focus_set()
+    return "break"          # que no meta un salto de linea
+t.bind("<Button-1>", lambda e: t.focus_set())
+t.bind("<KeyRelease>", _editado)
+t.bind("<Return>", _enter)
+t.bind("<Escape>", lambda e: root.focus_set())
 
 tick = 0
 
@@ -275,13 +296,13 @@ def abrir_modal(txt):
         modal["txt"].after(50, lambda: modal["barra"].actualizar(*modal["txt"].yview()))
 
 def poner(txt):
+    if t.focus_get() is t:            # estas escribiendo: no te piso el texto
+        return
     if t.get("1.0", "end-1c") == txt:
         return
-    t.configure(state="normal")
     t.delete("1.0", "end")
     t.insert("1.0", txt)
     t.see("end")
-    t.configure(state="disabled")
 
 def refrescar():
     global tick

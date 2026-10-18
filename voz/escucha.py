@@ -85,6 +85,9 @@ INVENTOS = ("suscríbete", "suscribete", "hasta la próxima", "hasta la proxima"
             "gracias", "adiós", "adios", "chau", "amara.org", "subtítulos", "subtitulos",
             "thank you", "thanks for watching", "subscribe", "see you", "bye bye")
 CORTO = 0.8                          # segundos de voz; menos que esto es una palabra suelta
+# whisper a veces copia la frase de ejemplo del prompt y la pega al final. se borra siempre
+ECO_PROMPT = re.compile(r"[\s,.]*\b(abr[ií] la p[aá]gina|open the page)\b\W*", re.I)
+ENVIAR_AHORA = CARPETA / "dictado_enviar"   # el panel lo crea cuando apretas Enter en la caja
 
 def es_invento(t):
     t = t.lower()
@@ -198,6 +201,20 @@ def main():
         callado = 0.0
         while True:
             x = q.get()
+            # apretaste Enter en la caja del panel: manda lo que hay escrito
+            if ENVIAR_AHORA.exists():
+                try: ENVIAR_AHORA.unlink()
+                except Exception: pass
+                if dictado is not None:
+                    orden = DICTADO.read_text(encoding="utf-8").strip() if DICTADO.exists() else ""
+                    dictado = None
+                    buf = []; hablando = False; callado = 0.0
+                    if orden:
+                        enviar(time.strftime("%H:%M:%S"), orden)
+                    else:
+                        beep(False)
+                    estado("escuchando")
+                    continue
             atender_cola()
             # si claude dejo algo para decir, lo digo
             try:
@@ -237,6 +254,7 @@ def main():
                                                 vad_filter=False, condition_on_previous_text=False,
                                                 initial_prompt=CFG.t("prompt_whisper"))
                     texto = " ".join(s.text for s in segs).strip()
+                    texto = ECO_PROMPT.sub(" ", texto).strip()   # saca el eco del prompt
                     dt = time.time() - t0
                     if not texto:
                         estado("escuchando")
@@ -342,6 +360,13 @@ def main():
                         # clip corto con un invento tipico: era "listo"
                         fin = True
                         texto = ""
+                    # lo que hay en la caja manda: si lo corregiste a mano, se respeta
+                    try:
+                        caja = DICTADO.read_text(encoding="utf-8").strip()
+                    except Exception:
+                        caja = " ".join(dictado).strip()
+                    if caja != " ".join(dictado).strip():
+                        dictado = [caja] if caja else []
                     if texto and not (corto and es_invento(texto)):
                         dictado.append(texto)
 

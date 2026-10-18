@@ -10,6 +10,7 @@ Default language is Spanish. Switch to English with one click on the panel. Voic
 ## What you get
 
 - **Wake word, no keys.** Say `go` (or `va`), speak, say `done`. The request lands in Claude Code.
+- **Edit before sending.** Click the dictation box and fix the transcript by hand. What is in the box is what gets sent: say `done` or press **Enter**. **Esc** releases the box.
 - **Status panel.** Shows whether it is idle, recording or transcribing, what you dictated, and every step Claude takes, in real time.
 - **Answer panel.** Claude's reply, formatted (headings, bullets, bold), attached above the status panel. Scrollable, collapsible, slightly transparent.
 - **Narration.** Say `narrate` and the answer is read aloud with a natural neural voice. Say `go` or `shut up` to stop it.
@@ -36,7 +37,9 @@ Claude writes its reply to `voz/ultima_respuesta.txt` (and copies it to `voz/res
 | say (en) | decís (es) | what happens |
 |---|---|---|
 | `go` … `done` | `va` … `listo` | dictate a request and send it |
-| `go` again | `va` de nuevo | clear and restart the dictation |
+| **Enter** in the box | **Enter** en la caja | send what is in the box (after editing it) |
+| `go` again | **Enter** en la caja | manda lo que hay en la caja (después de corregirlo) |
+| `va` de nuevo | clear and restart the dictation |
 | `cancel` | `cancelá` | drop the dictation |
 | `show answer` / `close` | `ver respuesta` / `cerralo` | open / close the answer panel |
 | `narrate` | `narralo` | read the answer out loud |
@@ -79,6 +82,7 @@ Idioma por defecto: español. Se pasa a inglés con un click en el panel. Los co
 ## Qué hace
 
 - **Palabra de activación, sin teclas.** Decís `va`, hablás, decís `listo`. La orden llega a Claude Code.
+- **Corregir antes de mandar.** Click en la caja de dictado y arreglás el texto a mano. Lo que queda en la caja es lo que se manda: decís `listo` o apretás **Enter**. **Esc** suelta la caja.
 - **Panel de estado.** Muestra si está en espera, grabando o transcribiendo, lo que dictaste, y cada paso que Claude ejecuta, en tiempo real.
 - **Panel de respuesta.** La respuesta de Claude formateada (títulos, viñetas, negritas), pegada arriba del panel. Con scroll, colapsable, un poco transparente.
 - **Narración.** Decís `narralo` y la respuesta se lee con una voz neuronal natural. `va` o `callate` la cortan.

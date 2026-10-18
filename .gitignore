@@ -10,3 +10,5 @@ __pycache__/
 .env
 voz/_tts/
 !voz/_agentes/
+voz/dictado_enviar
+voz/_tour.pid
