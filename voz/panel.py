@@ -123,7 +123,7 @@ class Globo(tk.Canvas):
     FUENTE = ("Segoe UI", 9)
     ANCHO_MAX, PAD, COLA, R = 210, 10, 12, 14
     def __init__(self, padre):
-        super().__init__(padre, bg=FONDO, highlightthickness=0)
+        super().__init__(padre, bg=KEY, highlightthickness=0)   # KEY es transparente en su ventana
     def mostrar(self, texto):
         # globo de pensamiento como en las historietas: nube blanca de borde negro grueso
         # y dos burbujitas que bajan hacia el personaje (abajo a la derecha)
@@ -133,7 +133,7 @@ class Globo(tk.Canvas):
         x1, y1, x2, y2 = self.bbox(t)
         tw, th = max(x2 - x1, 70), max(y2 - y1, 26)
         x0, y0 = r + m, r + m             # esquina del rectangulo interior (donde va el texto)
-        W, H = tw + 2 * (r + m) + 30, th + 2 * (r + m) + 6   # +30 a la derecha para las burbujitas
+        W, H = tw + 2 * (r + m), th + 2 * (r + m) + 30        # +30 abajo para las burbujitas
         self.configure(width=W, height=H)
         # bultos centrados sobre los bordes del rectangulo interior, con tamanos variados
         bultos = []
@@ -153,13 +153,25 @@ class Globo(tk.Canvas):
         for cx, cy, rr in bultos:
             self.create_oval(cx - rr, cy - rr, cx + rr, cy + rr, fill="white", outline="")
         self.create_rectangle(x0, y0, x0 + tw, y0 + th, fill="white", outline="")
-        # burbujitas hacia el personaje, que esta a la derecha
-        bx, by = x0 + tw + r + 6, y0 + th - 2
-        for (cx, cy, rr) in ((bx, by, 7), (bx + 14, by + 9, 4)):
+        # burbujitas que bajan hacia la cabeza del personaje
+        bx, by = x0 + tw * 0.6, y0 + th + r + 4
+        for (cx, cy, rr) in ((bx, by, 7), (bx + 10, by + 15, 4)):
             self.create_oval(cx - rr - 3, cy - rr - 3, cx + rr + 3, cy + rr + 3, fill="#111111", outline="")
             self.create_oval(cx - rr, cy - rr, cx + rr, cy + rr, fill="white", outline="")
         self.coords(t, x0 + (tw - (x2 - x1)) / 2, y0 + (th - (y2 - y1)) / 2); self.tag_raise(t)
-l_burbuja = Globo(cuerpo)
+# la nube vive en su propia ventana sin marco y con fondo transparente, flotando sobre la cabeza del personaje
+KEY = "#ff00fe"
+nube = tk.Toplevel(root); nube.overrideredirect(True); nube.attributes("-topmost", True)
+nube.attributes("-transparentcolor", KEY); nube.configure(bg=KEY); nube.withdraw()
+l_burbuja = Globo(nube); l_burbuja.pack()
+def _ubicar_nube():
+    # centrada sobre el personaje, pegada a su cabeza
+    if agente is None: return
+    W, H = l_burbuja.winfo_reqwidth(), l_burbuja.winfo_reqheight()
+    x = flot.winfo_x() + agente.w // 2 - W // 2 + 8
+    y = flot.winfo_y() - H + 10
+    x = max(0, min(x, root.winfo_screenwidth() - W))      # que no se salga de la pantalla
+    nube.geometry(f"{W}x{H}+{x}+{max(y, 0)}")
 _burbuja = {"texto": "", "desde": 0.0}
 def _refrescar_burbuja():
     import time as _t
@@ -178,12 +190,11 @@ def _refrescar_burbuja():
     if txt:
         if txt != _burbuja.get("pintado"):
             l_burbuja.mostrar(txt); _burbuja["pintado"] = txt
-        # pegado arriba del personaje, a la derecha de la fila de estado; la colita apunta al personaje
-        l_burbuja.place(in_=fila_pasos, relx=1.0, x=-94, rely=0.5, anchor="e")   # a la izquierda del personaje
-        tk.Misc.lift(l_burbuja)      # Canvas.lift es para items; este es el widget
+        if _visible[0]:
+            _ubicar_nube(); nube.deiconify(); nube.attributes("-topmost", True)
     else:
         _burbuja["pintado"] = ""
-        l_burbuja.place_forget()
+        nube.withdraw()
 
 # pasos de claude: una linea por paso, los hechos con ✓, el actual con spinner
 # accion.txt tiene un paso por linea; vacio = no esta haciendo nada
@@ -196,16 +207,51 @@ hueco.pack_propagate(False)
 l_accion = tk.Label(fila_pasos, text="", fg=ACENTO, bg=FONDO, font=("Consolas", 11),
                     justify="left", anchor="nw")
 l_accion.pack(side="left", fill="both", expand=True)
+_visible = [True]
 agente = None
+# el personaje vive en su propia ventana sin marco y transparente: asi se puede arrastrar a cualquier lado
+# de la pantalla, como los agentes de Windows. doble click lo devuelve a su lugar en el panel
+flot = tk.Toplevel(root); flot.overrideredirect(True); flot.attributes("-topmost", True)
+flot.attributes("-transparentcolor", KEY); flot.configure(bg=KEY); flot.withdraw()
+_dock = {"anclado": True, "ult": None, "visto": False}
+_arr = {"x": 0, "y": 0, "wx": 0, "wy": 0, "mov": False}
+def _p_ini(e):
+    _arr.update(x=e.x_root, y=e.y_root, wx=flot.winfo_x(), wy=flot.winfo_y(), mov=False)
+def _p_mov(e):
+    dx, dy = e.x_root - _arr["x"], e.y_root - _arr["y"]
+    if abs(dx) > 4 or abs(dy) > 4:
+        _arr["mov"] = True
+    if _arr["mov"]:
+        _dock["anclado"] = False
+        flot.geometry(f"+{_arr['wx'] + dx}+{_arr['wy'] + dy}")
+        _ubicar_nube()
+def _p_fin(e):
+    if not _arr["mov"] and agente is not None:
+        agente.modo("click", forzar=True)      # click sin arrastre: un gesto
+def _p_volver(e):
+    _dock["anclado"] = True; _dock["ult"] = None; _ubicar_personaje()
+def _ubicar_personaje():
+    # mientras esta anclado, sigue al hueco del panel (que puede moverse)
+    if agente is None or not _dock["anclado"]: return
+    x = hueco.winfo_rootx() + (hueco.winfo_width() - agente.w) // 2
+    y = hueco.winfo_rooty() + (hueco.winfo_height() - agente.h) // 2
+    if (x, y) != _dock["ult"]:
+        flot.geometry(f"{agente.w}x{agente.h}+{x}+{y}"); _dock["ult"] = (x, y)
+    if not _dock["visto"] and _visible[0]:
+        flot.deiconify(); flot.attributes("-topmost", True); _dock["visto"] = True
 def _crear_agente(nombre):
-    # arma el personaje centrado en su hueco; click derecho sobre el llama a esto con el siguiente
+    # arma el personaje en su ventana flotante; click derecho sobre el llama a esto con el siguiente
     global agente
     try:
         from agente import Agente
         if agente is not None:
             agente.destruir()
-        agente = Agente(hueco, nombre, bg=FONDO, al_cambiar=_cambiar_agente)
-        agente.place(relx=0.5, rely=0.5, anchor="center")
+        agente = Agente(flot, nombre, bg=KEY, al_cambiar=_cambiar_agente)
+        agente.pack()
+        agente.unbind("<Button-1>")
+        agente.bind("<Button-1>", _p_ini); agente.bind("<B1-Motion>", _p_mov)
+        agente.bind("<ButtonRelease-1>", _p_fin); agente.bind("<Double-Button-1>", _p_volver)
+        _dock["ult"] = None
     except Exception:
         agente = None
 def _cambiar_agente(nombre):
@@ -384,12 +430,11 @@ def poner(txt):
     t.see("end")
 
 OCULTO = C / "oculto"       # lo crea el escucha con "assistant hide"; lo borra con "assistant show"
-_visible = [True]
 def _ver(mostrar):
     if mostrar == _visible[0]:
         return
     _visible[0] = mostrar
-    for win in (root, modal.get("win")):
+    for win in (root, modal.get("win"), flot, nube if _burbuja.get("pintado") else None):
         if win is None: continue
         if mostrar: win.deiconify(); win.attributes("-topmost", True)
         else: win.withdraw()
@@ -414,6 +459,7 @@ def refrescar():
         if agente and agente._modo == "trabajando": agente.modo("listo")
     poner(leer(DICTADO))
     _ver(not OCULTO.exists())
+    _ubicar_personaje()
     _refrescar_burbuja()
     r = leer(RESP)
     if r:

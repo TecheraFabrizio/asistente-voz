@@ -51,6 +51,9 @@ class Agente(tk.Canvas):
         self.datos = json.loads((carpeta / "agent.json").read_text(encoding="utf-8"))
         self.fw, self.fh = self.datos["framesize"]
         self.escala = escala if escala is not None else ESCALA.get(nombre, 1.0)
+        # sobre el color clave de una ventana transparente, los bordes semitransparentes del sprite
+        # se mezclan con ese color y queda un halo. con alfa duro (todo o nada) no hay halo
+        self.alfa_duro = str(bg).lower() == "#ff00fe"
         self.w, self.h = int(self.fw * self.escala), int(self.fh * self.escala)
         super().__init__(padre, width=self.w, height=self.h, bg=bg, highlightthickness=0, cursor="hand2", **kw)
         self.mapa = Image.open(carpeta / "map.png").convert("RGBA")
@@ -74,6 +77,8 @@ class Agente(tk.Canvas):
                 base.alpha_composite(self.mapa.crop((x, y, x + self.fw, y + self.fh)))
             if self.escala != 1.0:
                 base = base.resize((self.w, self.h), Image.LANCZOS)
+            if self.alfa_duro:
+                base.putalpha(base.getchannel("A").point(lambda a: 255 if a >= 110 else 0))
             self.cache[clave] = ImageTk.PhotoImage(base)
         return self.cache[clave]
 
