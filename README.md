@@ -50,8 +50,8 @@ Claude writes its reply to `voz/ultima_respuesta.txt` (and copies it to `voz/res
 | say (en) | decís (es) | what happens |
 |---|---|---|
 | `go` … `done` | `va` … `listo` | dictate a request and send it |
-| **Enter** in the box | **Enter** en la caja | send what is in the box (after editing it) |
-| `go` again | **Enter** en la caja | manda lo que hay en la caja (después de corregirlo) |
+| **Enter** in the box | **Enter** en la caja | send what is in the box: typed or dictated, no `go` needed |
+| `go` again | **Enter** en la caja | manda lo que hay en la caja: tipeado o dictado, sin decir `va` |
 | `va` de nuevo | clear and restart the dictation |
 | `cancel` | `cancelá` | drop the dictation |
 | `show answer` / `close` | `ver respuesta` / `cerralo` | open / close the answer panel |

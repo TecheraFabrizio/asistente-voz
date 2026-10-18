@@ -217,18 +217,19 @@ def main():
             x = q.get()
             # apretaste Enter en la caja del panel: manda lo que hay escrito
             if ENVIAR_AHORA.exists():
+                # tambien sin "va": escribiste en la caja y apretaste Enter
                 try: ENVIAR_AHORA.unlink()
                 except Exception: pass
-                if dictado is not None:
-                    orden = DICTADO.read_text(encoding="utf-8").strip() if DICTADO.exists() else ""
-                    dictado = None
-                    buf = []; hablando = False; callado = 0.0
-                    if orden:
-                        enviar(time.strftime("%H:%M:%S"), orden)
-                    else:
-                        beep(False)
-                    estado("escuchando")
-                    continue
+                orden = DICTADO.read_text(encoding="utf-8").strip() if DICTADO.exists() else ""
+                dictado = None
+                buf = []; hablando = False; callado = 0.0
+                if orden:
+                    enviar(time.strftime("%H:%M:%S"), orden)
+                    DICTADO.write_text("", encoding="utf-8")
+                else:
+                    beep(False)
+                estado("escuchando")
+                continue
             atender_cola()
             # si claude dejo algo para decir, lo digo
             try:
