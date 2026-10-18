@@ -275,6 +275,11 @@ def main():
                     corto = dur_voz < CORTO
                     if dur_voz < 0.15:
                         continue            # un golpe, un click: no es una palabra. "done" dura 0.3 s (medido)
+                    rms = float(np.sqrt(np.mean(audio ** 2)))
+                    if corto and rms < 0.007:
+                        # clip corto y casi mudo: ruido de fondo que whisper convierte en "go." o "done." (medido 17-oct:
+                        # ruido 0.004-0.006, "go"/"done" reales 0.008-0.056). sin esto, cada uno pita
+                        continue
                     if corto:
                         # relleno con silencio: whisper inventa menos con clips cortos
                         pad = np.zeros(int(FS * 0.4), dtype=np.float32)
@@ -305,7 +310,6 @@ def main():
                     hora = time.strftime("%H:%M:%S")
                     with LOG.open("a", encoding="utf-8") as f:
                         f.write(f"{hora} | {texto}\n")
-                    rms = float(np.sqrt(np.mean(audio ** 2)))
                     print(f"[{dt:.2f}s {info.language} {dur_voz:.1f}s rms={rms:.3f}] {texto}")
 
                     ahora = time.time()
