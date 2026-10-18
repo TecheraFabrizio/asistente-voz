@@ -32,7 +32,9 @@ CLIPS = CARPETA / "_clips"          # ultimos clips de audio, para ajustar con l
 FS = 16000                           # whisper quiere 16 kHz
 BLOQUE = 0.05                        # 50 ms por bloque
 UMBRAL = 0.012                       # volumen minimo para "esta hablando"
-SILENCIO_FIN = 0.5                   # segundos callado = termino la frase
+SILENCIO_FIN = 0.9                   # segundos callado = termino la frase. con 0.5 las frases se cortaban en cada
+                                     # pausa y whisper recibia pedazos de 0.5 s sin contexto (18-oct: "se pone medio el chico"
+                                     # en pedazos vs "se pone medio lento" con la frase entera)
 MAX_FRASE = 15                       # corte duro en segundos
 MAX_DICTADO = 120                    # si no decis "listo" en 2 min, manda lo que hay
 
@@ -90,7 +92,7 @@ WAKE_FIN = re.compile(r"[\s,.:!¡]*\b(va|ba|bam|bye)\W*$", re.I)
 INVENTOS = ("suscríbete", "suscribete", "hasta la próxima", "hasta la proxima", "hola",
             "gracias", "adiós", "adios", "chau", "amara.org", "subtítulos", "subtitulos",
             "thank you", "thanks for watching", "subscribe", "see you", "bye bye")
-CORTO = 0.8                          # segundos de voz; menos que esto es una palabra suelta
+CORTO = 1.0                          # segundos de voz; menos que esto es una palabra suelta (idioma fijo, sin adivinar)
 # whisper a veces copia la frase de ejemplo del prompt y la pega al final. se borra siempre
 ECO_PROMPT = re.compile(r"[\s,.]*\b(abr[ií] la p[aá]gina|open the page)\b\W*", re.I)
 ENVIAR_AHORA = CARPETA / "dictado_enviar"   # el panel lo crea cuando apretas Enter en la caja
