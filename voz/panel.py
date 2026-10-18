@@ -67,8 +67,13 @@ def _pintar_lang():
     l_lang.configure(text="ES | en" if l == "es" else "es | EN")
 def _toggle_lang(e=None):
     CFG.set_lang("en" if CFG.lang() == "es" else "es")
+    _aplicar_lang()
+_lang_vista = [CFG.lang()]
+def _aplicar_lang():
+    # textos de la interfaz en el idioma configurado. lo llama el toggle,
+    # y tambien refrescar() si config.json cambio desde afuera (python voz/config.py en)
+    _lang_vista[0] = CFG.lang()
     _pintar_lang()
-    # textos de la interfaz en el idioma nuevo
     global ETIQUETA
     ETIQUETA = {"escuchando": CFG.t("espera"), "dictando": CFG.t("escuchando"),
                 "grabando": CFG.t("grabando"), "transcribiendo": CFG.t("transcribiendo"), "cargando": CFG.t("cargando")}
@@ -314,6 +319,8 @@ def refrescar():
     tick += 1
     if tick % 25 == 1:                    # cada 3 s alcanza
         l_modelo.configure(text=modelo_effort())
+    if tick % 8 == 0 and CFG.lang() != _lang_vista[0]:   # cambiaron el idioma desde afuera
+        _aplicar_lang()
     e = leer(ESTADO) or "apagado"
     l_estado.configure(text=ETIQUETA.get(e, e.upper()))
     punto.configure(fg=COLOR.get(e, TENUE))

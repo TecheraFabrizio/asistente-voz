@@ -20,6 +20,15 @@ Default language is English. Switch to Spanish with one click on the panel. Voic
 
 ## Setup
 
+After `pip install -r requirements.txt`, one command starts everything (listener, panel and Claude Code already watching the voice file):
+
+```
+start.bat        # Windows
+./start.sh       # Linux / macOS
+```
+
+No IDE needed: Claude Code runs in that terminal. VS Code is optional. By hand:
+
 ```
 pip install -r requirements.txt
 python voz/config.py en        # default. or: es
@@ -102,6 +111,15 @@ Idioma por defecto: inglés. Se pasa a español con un click en el panel. Los co
 - **Personaje animado.** Rover (el perrito de la búsqueda de Windows XP), Merlin el mago o Clippy viven en el panel: buscan y escriben mientras Claude trabaja, festejan al terminar, descansan en espera. Click izquierdo: una interacción al azar. Click derecho: cambia de personaje. Sprites del proyecto abierto clippy.js (MIT).
 
 ## Arranque
+
+Después de `pip install -r requirements.txt`, un solo comando arranca todo (escucha, panel y Claude Code ya vigilando el archivo de voz):
+
+```
+start.bat        # Windows
+./start.sh       # Linux / macOS
+```
+
+No hace falta IDE: Claude Code corre en esa terminal. VS Code es opcional. A mano:
 
 ```
 pip install -r requirements.txt
