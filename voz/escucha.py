@@ -19,7 +19,7 @@ from faster_whisper import WhisperModel
 # detector de voz (Silero, viene con faster-whisper): distingue habla de ruido en 1 a 6 ms.
 # medido 17-oct: silencio y ruido blanco -> no; voz, incluso 20 veces mas baja -> si
 from faster_whisper.vad import VadOptions, get_speech_timestamps
-VAD = VadOptions(threshold=0.5, min_speech_duration_ms=80, min_silence_duration_ms=100)
+VAD = VadOptions(threshold=0.3, min_speech_duration_ms=50, min_silence_duration_ms=100)
 
 CARPETA = Path(__file__).parent
 SALIDA = CARPETA / "entrada.txt"
@@ -281,6 +281,7 @@ def main():
                         continue            # un golpe, un click: no es una palabra. "done" dura 0.3 s (medido)
                     rms = float(np.sqrt(np.mean(audio ** 2)))
                     if not get_speech_timestamps(audio, VAD):
+                        print(f"[no es voz {dur_voz:.1f}s rms={rms:.3f}]")
                         continue            # hubo sonido pero no es una voz: no se transcribe ni pita
                     if corto:
                         # relleno con silencio: whisper inventa menos con clips cortos
@@ -400,7 +401,9 @@ def main():
                         continue
 
                     # "va" de nuevo mientras dictas: borra lo anterior y arranca de cero
-                    if dictado is not None and corto and pocas and (m or mf):
+                    # (vale tambien si lo dijiste lento: un clip largo que solo contiene "go")
+                    solo_va = pocas and m is not None and not texto[m.end():].strip()
+                    if dictado is not None and ((corto and pocas and (m or mf)) or solo_va):
                         dictado = []
                         dictado_desde = ahora
                         DICTADO.write_text("", encoding="utf-8")
