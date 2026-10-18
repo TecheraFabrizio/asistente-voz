@@ -58,6 +58,7 @@ Claude writes its reply to `voz/ultima_respuesta.txt` (and copies it to `voz/res
 | `narrate` | `narralo` | read the answer out loud |
 | `quiet` / `stop` | `callate` | stop the voice |
 | `clear arrows` | `borrá las flechas` | remove drawings |
+| `assistant hide` / `assistant show` | `asistente ocultar` / `asistente mostrar` | hide or show the panel (the listener keeps running) |
 
 ## Guided tours
 
@@ -154,6 +155,7 @@ Claude escribe su respuesta en `voz/ultima_respuesta.txt` (y la copia a `voz/res
 | `narralo` | lee la respuesta en voz alta |
 | `callate` | corta la voz |
 | `borrá las flechas` | saca los dibujos |
+| `asistente ocultar` / `asistente mostrar` | esconde o trae el panel (el escucha sigue) |
 
 ## Recorridos guiados
 

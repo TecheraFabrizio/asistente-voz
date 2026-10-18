@@ -314,6 +314,17 @@ def poner(txt):
     t.insert("1.0", txt)
     t.see("end")
 
+OCULTO = C / "oculto"       # lo crea el escucha con "assistant hide"; lo borra con "assistant show"
+_visible = [True]
+def _ver(mostrar):
+    if mostrar == _visible[0]:
+        return
+    _visible[0] = mostrar
+    for win in (root, modal.get("win")):
+        if win is None: continue
+        if mostrar: win.deiconify(); win.attributes("-topmost", True)
+        else: win.withdraw()
+
 def refrescar():
     global tick
     tick += 1
@@ -333,6 +344,7 @@ def refrescar():
         l_accion.configure(text="")
         if agente and agente._modo == "trabajando": agente.modo("listo")
     poner(leer(DICTADO))
+    _ver(not OCULTO.exists())
     r = leer(RESP)
     if r:
         abrir_modal(r)
