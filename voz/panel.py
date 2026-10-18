@@ -73,6 +73,8 @@ def _toggle_lang(e=None):
     ETIQUETA = {"escuchando": CFG.t("espera"), "dictando": CFG.t("escuchando"),
                 "grabando": CFG.t("grabando"), "transcribiendo": CFG.t("transcribiendo"), "cargando": CFG.t("cargando")}
     l_titulo.configure(text="◆  " + CFG.t("titulo"))
+    if modal.get("win") is not None and modal.get("titulo"):
+        modal["titulo"].configure(text="◆  " + CFG.t("respuesta"))   # el modal ya abierto tambien cambia
 l_lang.bind("<Button-1>", _toggle_lang)
 _pintar_lang()
 
@@ -264,7 +266,8 @@ def abrir_modal(txt):
         w.geometry(f"{ancho}x{alto}+{x0}+{max(y0, 0)}")
         cu = tk.Frame(w, bg=FONDO); cu.pack(fill="both", expand=True, padx=1, pady=1)
         cb = tk.Frame(cu, bg=PANEL, height=34); cb.pack(fill="x"); cb.pack_propagate(False)
-        tk.Label(cb, text="◆  " + CFG.t("respuesta"), fg=ACENTO, bg=PANEL, font=("Consolas", 11, "bold")).pack(side="left", padx=12)
+        tit = tk.Label(cb, text="◆  " + CFG.t("respuesta"), fg=ACENTO, bg=PANEL, font=("Consolas", 11, "bold")); tit.pack(side="left", padx=12)
+        modal["titulo"] = tit          # para que el toggle de idioma lo cambie en vivo
         x = tk.Label(cb, text="✕", fg=TENUE, bg=PANEL, font=("Consolas", 12), cursor="hand2"); x.pack(side="right", padx=12)
         x.bind("<Button-1>", lambda e: cerrar_modal())
         x.bind("<Enter>", lambda e: x.configure(fg="#c97b7b"))
