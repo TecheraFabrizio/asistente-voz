@@ -260,8 +260,8 @@ def main():
                     t0 = time.time()
                     dur_voz = len(audio) / FS - SILENCIO_FIN
                     corto = dur_voz < CORTO
-                    if dur_voz < 0.3:
-                        continue            # un golpe, un click: no es una palabra
+                    if dur_voz < 0.15:
+                        continue            # un golpe, un click: no es una palabra. "done" dura 0.3 s (medido)
                     if corto:
                         # relleno con silencio: whisper inventa menos con clips cortos
                         pad = np.zeros(int(FS * 0.4), dtype=np.float32)
