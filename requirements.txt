@@ -3,5 +3,5 @@ sounddevice
 numpy
 edge-tts
 pyautogui
-nvidia-cublas-cu12
-nvidia-cudnn-cu12
+nvidia-cublas-cu12; sys_platform != "darwin"
+nvidia-cudnn-cu12; sys_platform != "darwin"

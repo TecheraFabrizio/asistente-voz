@@ -31,7 +31,10 @@ FONDO = "#141414"
 TEXTO = "#ffe078"
 
 def click_through(win):
-    # hace que los clicks atraviesen la ventana
+    # hace que los clicks atraviesen la ventana. solo Windows: en Linux y Mac el dibujo se ve igual,
+    # pero los clicks no lo atraviesan (se cierra con "borra las flechas" o con el boton)
+    if not sys.platform.startswith("win"):
+        return
     GWL_EXSTYLE, WS_EX_LAYERED, WS_EX_TRANSPARENT = -20, 0x80000, 0x20
     hwnd = ctypes.windll.user32.GetParent(win.winfo_id())
     st = ctypes.windll.user32.GetWindowLongW(hwnd, GWL_EXSTYLE)

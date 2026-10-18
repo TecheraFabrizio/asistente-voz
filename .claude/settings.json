@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python voz/hook_paso.py prompt",
+            "command": "python voz/hook_paso.py prompt || python3 voz/hook_paso.py prompt",
             "timeout": 5,
             "statusMessage": "panel"
           }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python voz/hook_paso.py pre",
+            "command": "python voz/hook_paso.py pre || python3 voz/hook_paso.py pre",
             "timeout": 5,
             "statusMessage": "panel"
           }
@@ -29,7 +29,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python voz/hook_paso.py stop",
+            "command": "python voz/hook_paso.py stop || python3 voz/hook_paso.py stop",
             "timeout": 5,
             "statusMessage": "panel"
           }

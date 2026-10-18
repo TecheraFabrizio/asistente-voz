@@ -24,7 +24,7 @@ Default language is Spanish. Switch to English with one click on the panel. Voic
 pip install -r requirements.txt
 python voz/config.py en        # or: es  (default)
 python voz/escucha.py          # mic listener (GPU)
-pythonw voz/panel.py           # status + answer panel
+pythonw voz/panel.py           # status + answer panel (Linux/Mac: python voz/panel.py &)
 ```
 
 In Claude Code, watch `voz/entrada.txt` (Monitor with `tail -n0 -F`). Each line is a voice request.
@@ -65,10 +65,21 @@ See `voz/tour_ejemplo.json`. Coordinates are pixels on the monitor given by `x`,
 - `voz/tour.py` guided tour runner: draw, narrate, erase, next
 - `voz/hook_paso.py` Claude Code hook that feeds the panel
 - `overlay.py` click-through arrows and labels over the screen
-- `voz/agente.py` animated character (Rover / Merlin)
+- `voz/agente.py` animated character (Rover / Merlin / Clippy)
+- `voz/so.py` OS-specific bits: beep, processes, audio playback, offline voice, CUDA
 - `voz/tour_ejemplo.json` example tour
 
-Requires Windows, Python 3.11+, an NVIDIA GPU for Whisper (CPU works, slower) and internet for the neural voice (falls back to the Windows voice offline).
+## Platforms
+
+Works on **Windows, Linux and macOS**. Python 3.11+. Everything OS-specific lives in `voz/so.py`.
+
+- **GPU:** NVIDIA on Windows/Linux (CUDA libraries come with `pip install`). Without one, or on a Mac, Whisper runs on CPU: 2 to 4 s per sentence instead of under 1 s.
+- **Audio playback:** Windows uses .NET, macOS uses `afplay`, Linux needs `ffmpeg` (ffplay) or `mpv` installed.
+- **Offline voice** (no internet): Windows SAPI, macOS `say`, Linux `spd-say` or `espeak-ng`.
+- **Click-through overlays** (clicks pass through the drawings) are Windows-only. On Linux/macOS the drawings show the same but block clicks until you say `clear arrows`.
+- **Hooks** call `python` and fall back to `python3`.
+
+Tested on Windows 11. Linux and macOS support is written against the platform APIs but has not been run on those systems yet; please report issues.
 
 ---
 
@@ -96,7 +107,7 @@ Idioma por defecto: español. Se pasa a inglés con un click en el panel. Los co
 pip install -r requirements.txt
 python voz/config.py es        # o: en
 python voz/escucha.py          # escucha el mic (GPU)
-pythonw voz/panel.py           # panel de estado y respuesta
+pythonw voz/panel.py           # panel de estado y respuesta (Linux/Mac: python voz/panel.py &)
 ```
 
 En Claude Code, vigilar `voz/entrada.txt` (Monitor con `tail -n0 -F`). Cada línea es una orden de voz.
@@ -135,7 +146,18 @@ Ver `voz/tour_ejemplo.json`. Las coordenadas son píxeles del monitor indicado p
 - `voz/tour.py` recorrido guiado: dibuja, narra, borra, sigue
 - `voz/hook_paso.py` hook de Claude Code que alimenta el panel
 - `overlay.py` flechas y carteles click-through sobre la pantalla
-- `voz/agente.py` personaje animado (Rover / Merlin)
+- `voz/agente.py` personaje animado (Rover / Merlin / Clippy)
+- `voz/so.py` lo que depende del sistema: beep, procesos, audio, voz sin internet, CUDA
 - `voz/tour_ejemplo.json` recorrido de ejemplo
 
-Requiere Windows, Python 3.11+, GPU NVIDIA para Whisper (en CPU anda, más lento) e internet para la voz neuronal (sin internet usa la voz de Windows).
+## Plataformas
+
+Anda en **Windows, Linux y macOS**. Python 3.11 o más nuevo. Todo lo que depende del sistema está en `voz/so.py`.
+
+- **GPU:** NVIDIA en Windows/Linux (las librerías de CUDA vienen con el `pip install`). Sin GPU, o en Mac, Whisper corre en CPU: 2 a 4 s por frase en vez de menos de 1 s.
+- **Audio:** Windows usa .NET, macOS usa `afplay`, Linux necesita `ffmpeg` (ffplay) o `mpv` instalado.
+- **Voz sin internet:** Windows SAPI, macOS `say`, Linux `spd-say` o `espeak-ng`.
+- **Dibujos que dejan pasar los clicks:** sólo en Windows. En Linux/macOS se ven igual pero tapan los clicks hasta que decís `borrá las flechas`.
+- **Hooks:** llaman a `python` y si no existe, a `python3`.
+
+Probado en Windows 11. Linux y macOS están escritos contra las APIs de cada sistema pero todavía no se corrieron ahí; si algo falla, avisá.

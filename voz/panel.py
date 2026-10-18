@@ -184,7 +184,9 @@ def cerrar_modal():
         modal["txt"] = None
 
 def rect_vscode():
-    # donde esta la ventana de VS Code; el modal se abre en ese monitor
+    # donde esta la ventana de VS Code; el modal se abre en ese monitor. solo Windows
+    if not _s.platform.startswith("win"):
+        return None
     import ctypes, ctypes.wintypes as wt
     u = ctypes.windll.user32
     hallado = []

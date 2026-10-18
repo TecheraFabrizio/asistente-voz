@@ -6,18 +6,14 @@
 #       python voz/escucha.py --mic 2    (elegir mic por numero)
 #       python voz/escucha.py --listar   (ver mics)
 
-import sys, time, queue, re, os, glob, site
+import sys, time, queue, re, os
 
-# las dll de CUDA vienen por pip, hay que sumarlas al PATH
-# si no, whisper no encuentra cublas64_12.dll
-_dirs = []
-for _b in site.getsitepackages() + [site.getusersitepackages()]:
-    _dirs += glob.glob(os.path.join(_b, "nvidia", "*", "bin"))
-os.environ["PATH"] = os.pathsep.join(_dirs) + os.pathsep + os.environ["PATH"]
+# lo que depende del sistema operativo (beep, procesos, audio, CUDA) esta en so.py
+import so as SO
+SO.cargar_cuda()      # antes de importar whisper: le dice donde estan las librerias de la GPU
 
 import numpy as np
 import sounddevice as sd
-import winsound
 from pathlib import Path
 from faster_whisper import WhisperModel
 
@@ -75,9 +71,7 @@ HABLAR = CARPETA / "hablar.txt"        # si claude escribe algo aca, se dice en 
 BORRAR = re.compile(r"^\W*(borr\w*|sac\w*|quit\w*|cerr\w*|vora|clear|remove|delete|erase|hide)\b.{0,25}\b(flecha\w*|dibujo\w*|marca\w*|gr[aá]fico\w*|cartel\w*|arrow\w*|drawing\w*|mark\w*|overlay\w*)\b.{0,10}$", re.I)
 
 def borrar_overlays():
-    subprocess.run(["powershell", "-NoProfile", "-Command",
-                    "Get-CimInstance Win32_Process | ? { $_.Name -like 'python*' -and $_.CommandLine -like '*overlay.py*' } | % { Stop-Process -Id $_.ProcessId -Force }"],
-                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    SO.matar_por_nombre("overlay.py")
 # "va" al final de la frase: "quiero que abras. va"
 WAKE_FIN = re.compile(r"[\s,.:!¡]*\b(va|ba|bam|bye)\W*$", re.I)
 # frases que whisper inventa con audio corto; nunca las dijiste
@@ -102,7 +96,7 @@ def estado(txt):
     ESTADO.write_text(txt, encoding="utf-8")
 
 def beep(ok=True):
-    winsound.Beep(880 if ok else 440, 90)
+    SO.beep(ok)
 
 def enviar(hora, orden):
     # una orden que es solo un invento de whisper ("¡Suscríbete!") no se manda
@@ -135,8 +129,7 @@ def decir(texto):
         _voz["cola"].append(texto)
         return
     (CARPETA / "_decir.txt").write_text(texto, encoding="utf-8")
-    _voz["p"] = subprocess.Popen([sys.executable, str(CARPETA / "hablar.py"), str(CARPETA / "_decir.txt")],
-                                 stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    _voz["p"] = SO.lanzar([sys.executable, str(CARPETA / "hablar.py"), str(CARPETA / "_decir.txt")])
 
 def atender_cola():
     if _voz["cola"] and not voz_activa():
@@ -147,21 +140,16 @@ def callar():
     _voz["cola"].clear()
     p = _voz["p"]
     if p is not None and p.poll() is None:
-        # /T mata tambien el powershell hijo que reproduce el audio
-        subprocess.run(["taskkill", "/F", "/T", "/PID", str(p.pid)],
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        SO.matar(p.pid)      # tambien al hijo que reproduce el audio
     _voz["p"] = None
     if TOUR_PID.exists():
         try:
-            subprocess.run(["taskkill", "/F", "/T", "/PID", TOUR_PID.read_text().strip()],
-                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            SO.matar(TOUR_PID.read_text().strip())
         except Exception:
             pass
         TOUR_PID.unlink(missing_ok=True)
         # el overlay del paso queda huerfano: lo mato por nombre de archivo
-        subprocess.run(["powershell", "-NoProfile", "-Command",
-                        "Get-CimInstance Win32_Process | ? { $_.CommandLine -like '*_paso.json*' } | % { Stop-Process -Id $_.ProcessId -Force }"],
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        SO.matar_por_nombre("_paso.json")
     FLAG_HABLANDO.unlink(missing_ok=True)
 
 def main():
@@ -181,7 +169,12 @@ def main():
     print("cargando whisper...")
     # small: 0.7 s por frase. medium: 2.7 s. turbo: 9.9 s (medido 17-oct-2026, RTX 4060 Ti).
     # small con beam 5 es el mejor equilibrio entre rapidez y precision.
-    modelo = WhisperModel("small", device="cuda", compute_type="float16")
+    try:
+        modelo = WhisperModel("small", device="cuda", compute_type="float16")
+    except Exception as ex:
+        # sin GPU NVIDIA (o sin sus librerias): CPU. anda, tarda 2 a 4 s por frase
+        print("sin GPU, uso CPU:", type(ex).__name__)
+        modelo = WhisperModel("small", device="cpu", compute_type="int8")
     # calentar: la primera llamada es lenta
     modelo.transcribe(np.zeros(FS, dtype=np.float32), language=LANG)
     print("listo. deci 'va' y la orden.")

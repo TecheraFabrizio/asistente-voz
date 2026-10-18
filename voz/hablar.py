@@ -2,7 +2,8 @@
 # Voces neuronales de Microsoft por internet (edge-tts).
 # Habla frase por frase: la primera arranca en menos de un segundo,
 # las siguientes se generan mientras suena la anterior.
-# Si no hay internet, cae a la voz de Windows (inglesa, suena mal pero suena).
+# Si no hay internet, cae a la voz del sistema (Windows, say en Mac, espeak en Linux).
+# Linux y Mac: necesitan un reproductor de mp3 (afplay viene en Mac; en Linux ffmpeg o mpv).
 #
 # Uso:  python voz/hablar.py --texto "Listo"
 #       python voz/hablar.py archivo.txt
@@ -13,6 +14,7 @@ from pathlib import Path
 C = Path(__file__).parent
 sys.path.insert(0, str(C))
 import config as CFG
+import so as SO             # reproducir audio y voz local segun el sistema operativo
 VOZ = CFG.t("voz")          # es-UY-MateoNeural o en-US-GuyNeural segun config.json
 TMP = C / "_tts"            # mp3 de cada frase
 TMP.mkdir(exist_ok=True)
@@ -23,18 +25,8 @@ def frases(texto):
     return [p.strip() for p in partes if p and p.strip()]
 
 def reproducir(mp3):
-    # MediaPlayer de .NET; espera a que termine
-    ps = (
-        "Add-Type -AssemblyName presentationCore; "
-        "$p = New-Object System.Windows.Media.MediaPlayer; "
-        f"$p.Open([Uri]'{mp3}'); "
-        "$t0 = Get-Date; while (-not $p.NaturalDuration.HasTimeSpan) { Start-Sleep -Milliseconds 30; "
-        "if (((Get-Date) - $t0).TotalSeconds -gt 5) { break } }; "
-        "$p.Play(); "
-        "$d = $p.NaturalDuration.TimeSpan.TotalMilliseconds; Start-Sleep -Milliseconds ([int]$d + 150); $p.Close()"
-    )
-    subprocess.run(["powershell", "-NoProfile", "-WindowStyle", "Hidden", "-Command", ps],
-                   stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    # toca el mp3 y espera a que termine
+    SO.reproducir(mp3)
 
 async def generar(texto, destino):
     import edge_tts
@@ -54,10 +46,8 @@ async def hablar_async(texto):
         await loop.run_in_executor(None, reproducir, TMP / f"{i:03d}.mp3")
 
 def sapi(texto):
-    ps = ("Add-Type -AssemblyName System.Speech; "
-          "$s = New-Object System.Speech.Synthesis.SpeechSynthesizer; $s.Speak(" + repr(texto) + ")")
-    subprocess.run(["powershell", "-NoProfile", "-WindowStyle", "Hidden", "-Command", ps],
-                   stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    # voz del sistema, sin internet
+    SO.voz_local(texto)
 
 def hablar(texto):
     texto = texto.strip()

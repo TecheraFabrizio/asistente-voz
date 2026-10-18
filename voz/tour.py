@@ -13,6 +13,8 @@ import sys, json, subprocess, time, os
 from pathlib import Path
 
 C = Path(__file__).parent
+sys.path.insert(0, str(C))
+import so as SO              # lanzar y matar procesos segun el sistema operativo
 RAIZ = C.parent
 FLAG = C / "_hablando"
 PID = C / "_tour.pid"
@@ -25,8 +27,7 @@ def main():
     try:
         for p in cfg["pasos"]:
             PASO.write_text(json.dumps({**base, "items": p["items"]}, ensure_ascii=False), encoding="utf-8")
-            ov = subprocess.Popen([sys.executable.replace("python.exe", "pythonw.exe"), str(RAIZ / "overlay.py"), str(PASO)],
-                                  stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            ov = SO.lanzar([SO.pythonw(), str(RAIZ / "overlay.py"), str(PASO)])
             time.sleep(0.6)
             FLAG.write_text("1", encoding="utf-8")
             try:
@@ -35,8 +36,7 @@ def main():
             finally:
                 FLAG.unlink(missing_ok=True)
             time.sleep(0.4)
-            subprocess.run(["taskkill", "/F", "/T", "/PID", str(ov.pid)],
-                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            SO.matar(ov.pid)
     finally:
         FLAG.unlink(missing_ok=True)
         PID.unlink(missing_ok=True)
