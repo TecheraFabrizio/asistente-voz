@@ -49,6 +49,7 @@ def main():
         data = {}
     if ev == "stop":
         ACCION.write_text("", encoding="utf-8")
+        (ACCION.parent / "burbuja.txt").write_text(CFG.t("listo"), encoding="utf-8")   # el personaje lo dice en su globo
         # si la orden vino por voz, avisa hablando que termino
         flag = ACCION.parent / "orden_pendiente"
         if flag.exists():
@@ -61,6 +62,7 @@ def main():
         return
     if ev == "prompt":
         ACCION.write_text(CFG.t("procesando") + "\n", encoding="utf-8")
+        (ACCION.parent / "burbuja.txt").write_text(CFG.t("procesando"), encoding="utf-8")
         return
     paso = paso_de(data.get("tool_name", ""), data.get("tool_input", {}) or {})
     try:

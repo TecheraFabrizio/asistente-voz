@@ -16,7 +16,7 @@ Default language is English. Switch to Spanish with one click on the panel. Voic
 - **Narration.** Say `narrate` and the answer is read aloud with a natural neural voice. Say `go` or `quiet` to stop it.
 - **Guided tours.** Claude draws arrows, boxes and labels over any window, narrates each step, erases it and moves to the next. Click-through: you keep using the app underneath.
 - **Language toggle.** `ES | EN` on the panel switches transcription, voice and UI strings live.
-- **Animated character.** Rover (the Windows XP search dog), Merlin the wizard or Clippy lives on the panel: searches and writes while Claude works, celebrates when done, rests when idle. Left-click it for a random interaction, right-click to switch character. Sprites from the open-source clippy.js project (MIT).
+- **Animated character.** Rover (the Windows XP search dog), Merlin the wizard or Clippy lives on the panel: searches and writes while Claude works, celebrates when done, rests when idle. Left-click it for a random interaction, right-click to switch character. It has a speech bubble: "processing", "done", whatever is being read aloud, and confirmations Claude asks for (`voz/burbuja.txt`). Sprites from the open-source clippy.js project (MIT).
 
 ## Setup
 
@@ -115,7 +115,7 @@ Idioma por defecto: inglés. Se pasa a español con un click en el panel. Los co
 - **Narración.** Decís `narralo` y la respuesta se lee con una voz neuronal natural. `va` o `callate` la cortan.
 - **Recorridos guiados.** Claude dibuja flechas, recuadros y carteles sobre cualquier ventana, narra cada paso, lo borra y sigue. Los clicks atraviesan el dibujo.
 - **Idioma.** `ES | EN` en el panel cambia transcripción, voz y textos en vivo.
-- **Personaje animado.** Rover (el perrito de la búsqueda de Windows XP), Merlin el mago o Clippy viven en el panel: buscan y escriben mientras Claude trabaja, festejan al terminar, descansan en espera. Click izquierdo: una interacción al azar. Click derecho: cambia de personaje. Sprites del proyecto abierto clippy.js (MIT).
+- **Personaje animado.** Rover (el perrito de la búsqueda de Windows XP), Merlin el mago o Clippy viven en el panel: buscan y escriben mientras Claude trabaja, festejan al terminar, descansan en espera. Click izquierdo: una interacción al azar. Click derecho: cambia de personaje. Tiene un globo de diálogo: "procesando", "listo", lo que se narra, y las confirmaciones que pide Claude (`voz/burbuja.txt`). Sprites del proyecto abierto clippy.js (MIT).
 
 ## Arranque
 

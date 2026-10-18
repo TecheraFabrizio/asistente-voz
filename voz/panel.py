@@ -116,6 +116,28 @@ fila = tk.Frame(cuerpo, bg=FONDO); fila.pack(fill="x", padx=14, pady=(10, 2))
 punto = tk.Label(fila, text="●", fg=TENUE, bg=FONDO, font=("Consolas", 14)); punto.pack(side="left")
 l_estado = tk.Label(fila, text="...", fg=TEXTO, bg=FONDO, font=("Consolas", 11)); l_estado.pack(side="left", padx=8)
 
+# globo de dialogo del personaje: burbuja.txt tiene el texto; vacio = escondido. se borra solo a los 20 s
+BURBUJA = C / "burbuja.txt"
+l_burbuja = tk.Label(cuerpo, text="", fg=TEXTO, bg="#2a3442", font=("Segoe UI", 10), wraplength=300,
+                     justify="left", padx=10, pady=5, highlightthickness=1, highlightbackground=ACENTO)
+_burbuja = {"texto": "", "desde": 0.0}
+def _refrescar_burbuja():
+    import time as _t
+    txt = leer(BURBUJA).strip()
+    if txt != _burbuja["texto"]:
+        _burbuja["texto"], _burbuja["desde"] = txt, _t.time()
+    if txt and _t.time() - _burbuja["desde"] > 20:
+        try: BURBUJA.write_text("", encoding="utf-8")
+        except Exception: pass
+        txt = ""
+    if txt:
+        l_burbuja.configure(text=txt)
+        # pegado arriba del personaje, a la derecha de la fila de estado
+        l_burbuja.place(in_=fila, relx=1.0, x=0, y=-2, anchor="ne")
+        l_burbuja.lift()
+    else:
+        l_burbuja.place_forget()
+
 # pasos de claude: una linea por paso, los hechos con ✓, el actual con spinner
 # accion.txt tiene un paso por linea; vacio = no esta haciendo nada
 # a la derecha, el personaje animado (Rover o Merlin) que trabaja cuando yo trabajo
@@ -345,6 +367,7 @@ def refrescar():
         if agente and agente._modo == "trabajando": agente.modo("listo")
     poner(leer(DICTADO))
     _ver(not OCULTO.exists())
+    _refrescar_burbuja()
     r = leer(RESP)
     if r:
         abrir_modal(r)

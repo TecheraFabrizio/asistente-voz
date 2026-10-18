@@ -128,7 +128,14 @@ def voz_activa():
     p = _voz["p"]
     return (p is not None and p.poll() is None) or FLAG_HABLANDO.exists()
 
+BURBUJA = CARPETA / "burbuja.txt"      # globo del personaje: muestra lo que digo en voz alta
 def decir(texto):
+    # lo que se dice tambien aparece en el globo del personaje (la primera frase, corta)
+    try:
+        frase = re.split(r"(?<=[.!?])\s+", texto.strip())[0][:120]
+        BURBUJA.write_text(frase, encoding="utf-8")
+    except Exception:
+        pass
     # si ya hay voz sonando, va a la cola: nada se pisa
     if voz_activa():
         _voz["cola"].append(texto)
@@ -364,6 +371,7 @@ def main():
                         dictado = []
                         dictado_desde = ahora
                         DICTADO.write_text("", encoding="utf-8")   # borra lo viejo de la caja
+                        BURBUJA.write_text("", encoding="utf-8")   # y el globo del personaje
                         beep(True)
 
                     if CANCEL.match(texto):
