@@ -89,7 +89,7 @@ See `CHANGELOG.md` for everything done so far.
 
 Works on **Windows, Linux and macOS**. Python 3.11+. Everything OS-specific lives in `voz/so.py`.
 
-- **GPU:** NVIDIA on Windows/Linux (CUDA libraries come with `pip install`). Without one, or on a Mac, Whisper runs on CPU: 2 to 4 s per sentence instead of under 1 s.
+- **GPU:** NVIDIA on Windows/Linux (CUDA libraries come with `pip install`). With a GPU it runs Whisper large-v3-turbo (measured 0.5 s per sentence on an RTX 4060 Ti). Without one, or on a Mac, it falls back to Whisper small on CPU: 2 to 4 s per sentence.
 - **Audio playback:** Windows uses .NET, macOS uses `afplay`, Linux needs `ffmpeg` (ffplay) or `mpv` installed.
 - **Offline voice** (no internet): Windows SAPI, macOS `say`, Linux `spd-say` or `espeak-ng`.
 - **Click-through overlays** (clicks pass through the drawings) are Windows-only. On Linux/macOS the drawings show the same but block clicks until you say `clear arrows`.
@@ -186,7 +186,7 @@ En `CHANGELOG.md` está todo lo hecho hasta ahora.
 
 Anda en **Windows, Linux y macOS**. Python 3.11 o más nuevo. Todo lo que depende del sistema está en `voz/so.py`.
 
-- **GPU:** NVIDIA en Windows/Linux (las librerías de CUDA vienen con el `pip install`). Sin GPU, o en Mac, Whisper corre en CPU: 2 a 4 s por frase en vez de menos de 1 s.
+- **GPU:** NVIDIA en Windows/Linux (las librerías de CUDA vienen con el `pip install`). Con GPU corre Whisper large-v3-turbo (medido: 0,5 s por frase en una RTX 4060 Ti). Sin GPU, o en Mac, cae a Whisper small en CPU: 2 a 4 s por frase.
 - **Audio:** Windows usa .NET, macOS usa `afplay`, Linux necesita `ffmpeg` (ffplay) o `mpv` instalado.
 - **Voz sin internet:** Windows SAPI, macOS `say`, Linux `spd-say` o `espeak-ng`.
 - **Dibujos que dejan pasar los clicks:** sólo en Windows. En Linux/macOS se ven igual pero tapan los clicks hasta que decís `borrá las flechas`.

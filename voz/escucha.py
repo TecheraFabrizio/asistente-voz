@@ -27,6 +27,7 @@ SALIDA = CARPETA / "entrada.txt"
 LOG = CARPETA / "todo.txt"          # todo lo que escucho, para debug
 ESTADO = CARPETA / "estado.txt"     # lo lee el panel
 DICTADO = CARPETA / "dictado.txt"   # texto que vas dictando, lo muestra el panel
+CLIPS = CARPETA / "_clips"          # ultimos clips de audio, para ajustar con la voz real
 
 FS = 16000                           # whisper quiere 16 kHz
 BLOQUE = 0.05                        # 50 ms por bloque
@@ -205,10 +206,10 @@ def main():
 
     estado("cargando")
     print("cargando whisper...")
-    # small: 0.7 s por frase. medium: 2.7 s. turbo: 9.9 s (medido 17-oct-2026, RTX 4060 Ti).
-    # small con beam 5 es el mejor equilibrio entre rapidez y precision.
+    # medido 18-oct-2026 en RTX 4060 Ti, beam 5: small 0.55-0.67 s por frase, medium 1.4-2.0 s,
+    # large-v3-turbo 0.48-0.60 s y entiende mucho mejor el acento. en GPU va turbo; en CPU, small
     try:
-        modelo = WhisperModel("small", device="cuda", compute_type="float16")
+        modelo = WhisperModel("large-v3-turbo", device="cuda", compute_type="float16")
     except Exception as ex:
         # sin GPU NVIDIA (o sin sus librerias): CPU. anda, tarda 2 a 4 s por frase
         print("sin GPU, uso CPU:", type(ex).__name__)
@@ -278,6 +279,7 @@ def main():
                     t0 = time.time()
                     dur_voz = len(audio) / FS - SILENCIO_FIN
                     corto = dur_voz < CORTO
+                    audio_crudo = audio
                     if dur_voz < 0.15:
                         continue            # un golpe, un click: no es una palabra. "done" dura 0.3 s (medido)
                     rms = float(np.sqrt(np.mean(audio ** 2)))
@@ -315,6 +317,17 @@ def main():
                         estado("escuchando")
                         continue
                     hora = time.strftime("%H:%M:%S")
+                    try:
+                        # guarda los ultimos 30 clips (wav) para ajustar con tu voz real; CLIPS esta en el .gitignore
+                        import wave
+                        CLIPS.mkdir(exist_ok=True)
+                        viejos = sorted(CLIPS.glob("*.wav"))
+                        for v in viejos[:-29]: v.unlink(missing_ok=True)
+                        with wave.open(str(CLIPS / (hora.replace(":", "") + ".wav")), "wb") as wf:
+                            wf.setnchannels(1); wf.setsampwidth(2); wf.setframerate(FS)
+                            wf.writeframes((np.clip(audio_crudo, -1, 1) * 32767).astype(np.int16).tobytes())
+                    except Exception:
+                        pass
                     with LOG.open("a", encoding="utf-8") as f:
                         f.write(f"{hora} | {texto}\n")
                     print(f"[{dt:.2f}s {info.language} {dur_voz:.1f}s rms={rms:.3f}] {texto}")
