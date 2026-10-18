@@ -10,6 +10,7 @@ import sys, time, queue, re, os
 
 # lo que depende del sistema operativo (beep, procesos, audio, CUDA) esta en so.py
 import so as SO
+SO.unica_instancia("escucha", os.path.dirname(os.path.abspath(__file__)))   # mata un escucha anterior si quedo vivo
 SO.cargar_cuda()      # antes de importar whisper: le dice donde estan las librerias de la GPU
 
 import numpy as np

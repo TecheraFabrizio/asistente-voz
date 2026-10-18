@@ -26,6 +26,8 @@ COLOR = {"escuchando": "#7cb88a", "grabando": "#c97b7b", "transcribiendo": "#c9a
 # "escuchando" es solo despues de la palabra clave. textos segun idioma (config.json)
 import sys as _s; _s.path.insert(0, str(C))
 import config as CFG
+import so as SO
+SO.unica_instancia("panel", str(C))    # mata un panel anterior si quedo vivo
 ETIQUETA = {"escuchando": CFG.t("espera"), "dictando": CFG.t("escuchando"),
             "grabando": CFG.t("grabando"), "transcribiendo": CFG.t("transcribiendo"), "cargando": CFG.t("cargando")}
 ULTIMA = C / "ultima_respuesta.txt"   # ultima respuesta, para "ver respuesta"

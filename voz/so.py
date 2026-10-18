@@ -10,6 +10,20 @@ LINUX = not WIN and not MAC
 
 _NADA = dict(stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
+def unica_instancia(nombre, carpeta):
+    # si ya habia una copia corriendo (restart a medias, doble click), la mata: dos paneles encimados confunden
+    pidf = os.path.join(carpeta, f"_{nombre}.pid")
+    try:
+        viejo = int(open(pidf).read().strip())
+        if viejo != os.getpid():
+            matar(viejo)
+    except Exception:
+        pass
+    try:
+        open(pidf, "w").write(str(os.getpid()))
+    except Exception:
+        pass
+
 def cargar_cuda():
     # las librerias de CUDA vienen por pip (paquetes nvidia-*). hay que avisarle al sistema donde estan
     # en mac no hay CUDA: whisper corre en CPU
@@ -107,6 +121,10 @@ def _reproductor(mp3):
 def reproducir(mp3):
     # toca un mp3 y espera a que termine
     mp3 = str(mp3)
+    if WIN and shutil.which("ffplay"):
+        # ffplay arranca en 0.3 s; el MediaPlayer de .NET via PowerShell tarda 2 s en arrancar (medido 17-oct)
+        subprocess.run(["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", mp3], creationflags=subprocess.CREATE_NO_WINDOW, **_NADA)
+        return
     if WIN:
         # MediaPlayer de .NET, sin ventana
         ps = (
